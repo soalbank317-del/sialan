@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIALAN – Rekap KBM</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+
+<!-- Load Navbar Publik -->
+<div id="navbarContainer"></div>
+
+<section class="container my-4">
+<div class="d-flex align-items-center mb-4">
+    <img src="https://drive.google.com/file/d/1SMsQrY1Q9L-NRMcmJIk7y1msb5YFcOzM/view?usp=drive_link" alt="Profil" class="profile-img me-3">
+    <div>
+      <div>Nama Wali Kelas: <span id="userName">Admin</span></div>
+      <div>Kelas: <span id="userKelas">7A</span></div>
+    </div>
+  </div>
+  
+  <h3 class="mb-4">Rekap Data KBM</h3>
+
+  <div class="row mb-3">
+    <div class="col-md-3">
+      <select id="filterKelas" class="form-select">
+        <option value="">Semua Kelas</option>
+      </select>
+    </div>
+    <div class="col-md-3">
+      <select id="filterMapel" class="form-select">
+        <option value="">Semua Mata Pelajaran</option>
+      </select>
+    </div>
+    <div class="col-md-3">
+      <select id="filterStatus" class="form-select">
+        <option value="">Semua Status</option>
+        <option value="Tuntas">Tuntas</option>
+        <option value="Ujian">Ujian</option>
+      </select>
+    </div>
+    <div class="col-md-3">
+      <input type="text" id="searchNama" class="form-control" placeholder="Cari nama siswa">
+    </div>
+  </div>
+
+  <div class="mb-3 d-flex">
+    <button class="btn btn-primary me-2" id="applyFilter">Terapkan Filter</button>
+    <button class="btn btn-secondary" id="resetFilter">Reset Filter</button>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-striped table-bordered" id="rekapTable">
+      <thead>
+        <tr>
+          <th>Tanggal</th>
+          <th>Wali Kelas</th>
+          <th>Mata Pelajaran</th>
+          <th>Kelas</th>
+          <th>Nama Siswa</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</section>
+
+<footer>
+  © 2025 SIALAN – Sistem Analisis Laporan KBM Siswa
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Load Navbar Publik
+  fetch('navbar_admin.html')
+    .then(res => res.text())
+    .then(html => document.getElementById('navbarContainer').innerHTML = html);
+
+  // Fetch data spreadsheet publik
+  async function loadRekapData() {
+    const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQAEwBLEhaehGYlzYsNhBPfmozGvRZmpjyEOHC8rfgduB0JRurz-xwI_jfW8Fw8Vaz93a_E9tLyuIX9/pub?gid=0&single=true&output=csv";
+    const res = await fetch(url);
+    const csvText = await res.text();
+    const lines = csvText.split("\n").filter(l => l.trim() !== "");
+    const headers = lines[0].split(",");
+    return lines.slice(1).map(line => {
+      const vals = line.split(",");
+      const obj = {};
+      headers.forEach((h,i) => obj[h.trim()] = vals[i].trim());
+      return obj;
+    });
+  }
+
+  function renderTable(data) {
+    const tbody = document.querySelector('#rekapTable tbody');
+    tbody.innerHTML = '';
+    data.forEach(row => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${row.Tanggal}</td>
+                      <td>${row.Wali_Kelas}</td>
+                      <td>${row.Mata_Pelajaran}</td>
+                      <td>${row.Kelas}</td>
+                      <td>${row.Nama_Siswa}</td>
+                      <td>${row.Status}</td>`;
+      tbody.appendChild(tr);
+    });
+  }
+
+  async function populateFilters() {
+    const data = await loadRekapData();
+
+    const kelasSet = new Set(data.map(d => d.Kelas));
+    const mapelSet = new Set(data.map(d => d.Mata_Pelajaran));
+
+    const kelasSelect = document.getElementById('filterKelas');
+    kelasSet.forEach(k => kelasSelect.innerHTML += `<option value="${k}">${k}</option>`);
+
+    const mapelSelect = document.getElementById('filterMapel');
+    mapelSet.forEach(m => mapelSelect.innerHTML += `<option value="${m}">${m}</option>`);
+
+    renderTable(data);
+
+    document.getElementById('applyFilter').addEventListener('click', () => {
+      const kelas = kelasSelect.value;
+      const mapel = mapelSelect.value;
+      const status = document.getElementById('filterStatus').value;
+      const search = document.getElementById('searchNama').value.toLowerCase();
+
+      const filtered = data.filter(d => 
+        (!kelas || d.Kelas === kelas) &&
+        (!mapel || d.Mata_Pelajaran === mapel) &&
+        (!status || d.Status === status) &&
+        (!search || d.Nama_Siswa.toLowerCase().includes(search))
+      );
+      renderTable(filtered);
+    });
+
+    document.getElementById('resetFilter').addEventListener('click', () => {
+      kelasSelect.value = '';
+      mapelSelect.value = '';
+      document.getElementById('filterStatus').value = '';
+      document.getElementById('searchNama').value = '';
+      renderTable(data);
+    });
+  }
+
+  populateFilters();
+</script>
+</body>
+</html>

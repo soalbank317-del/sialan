@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIALAN – Admin Input KBM</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+<style>
+/* Tombol Phoenix Glossy */
+.btn-phoenix {
+    font-weight: 600;
+    border-radius: 12px;
+    transition: all 0.25s ease-in-out;
+    padding: 0.6rem 1.4rem;
+    margin-right: 10px;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    border: none;
+    color: #fff;
+}
+.btn-tuntas { background: linear-gradient(145deg,#28a745,#198754);}
+.btn-tuntas:hover { transform: translateY(-2px); box-shadow:0 8px 22px rgba(0,0,0,0.12);}
+.btn-ujian { background: linear-gradient(145deg,#dc3545,#b02a37);}
+.btn-ujian:hover { transform: translateY(-2px); box-shadow:0 8px 22px rgba(0,0,0,0.12);}
+</style>
+</head>
+<body>
+
+<!-- Navbar Admin -->
+<div id="navbarContainer"></div>
+
+<!-- Konten Admin -->
+<section class="container my-4">
+<div class="d-flex align-items-center mb-4">
+    <img src="https://drive.google.com/file/d/1SMsQrY1Q9L-NRMcmJIk7y1msb5YFcOzM/view?usp=drive_link" alt="Profil" class="profile-img me-3">
+    <div>
+      <div>Nama Wali Kelas: <span id="userName">Admin</span></div>
+      <div>Kelas: <span id="userKelas">7A</span></div>
+    </div>
+</div>
+
+<h3 class="mb-4">Input Data KBM</h3>
+
+<div class="row mb-3">
+  <div class="col-md-3">
+    <input type="date" id="tanggal" class="form-control" required>
+  </div>
+  <div class="col-md-3">
+    <select id="waliKelas" class="form-select" required>
+      <option value="">Wali Kelas</option>
+    </select>
+  </div>
+  <div class="col-md-3">
+    <select id="mataPelajaran" class="form-select" required>
+      <option value="">Mata Pelajaran</option>
+    </select>
+  </div>
+  <div class="col-md-3">
+    <select id="kelas" class="form-select" required>
+      <option value="">Kelas</option>
+    </select>
+  </div>
+</div>
+
+<div class="mb-3 d-flex">
+  <button class="btn btn-success me-2" id="tuntasAllBtn">Tuntas Semua</button>
+  <button class="btn btn-danger" id="ujianAllBtn">Ujian Semua</button>
+</div>
+
+<div class="table-responsive">
+  <table class="table table-striped table-bordered" id="siswaTable">
+    <thead>
+      <tr>
+        <th>No</th>
+        <th>Nama Siswa</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<button class="btn btn-info w-100 mt-3" id="saveBtn">Simpan Semua</button>
+</section>
+
+<!-- Footer -->
+<footer>
+  © 2025 SIALAN – Sistem Analisis Laporan KBM Siswa
+</footer>
+
+<!-- Modal Login -->
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="loginModalLabel">Login Admin</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+      </div>
+      <div class="modal-body">
+        <form id="loginForm">
+          <div class="mb-3">
+            <label for="usernameInput" class="form-label">Username</label>
+            <input type="text" class="form-control" id="usernameInput" required>
+          </div>
+          <div class="mb-3">
+            <label for="passwordInput" class="form-label">Password</label>
+            <input type="password" class="form-control" id="passwordInput" required>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Login</button>
+        </form>
+        <div id="loginError" class="text-danger mt-2" style="display:none;">Username atau password salah!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Logout -->
+<div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="logoutModalLabel">Konfirmasi Logout</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+      </div>
+      <div class="modal-body">
+        Apakah Anda yakin ingin logout dari sistem?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+        <button type="button" class="btn btn-danger" id="confirmLogout">Logout</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// --- Load Navbar Admin ---
+fetch('navbar_admin.html')
+  .then(res => res.text())
+  .then(html => {
+    document.getElementById('navbarContainer').innerHTML = html;
+
+    // Jika user belum login, sembunyikan konten dan munculkan login modal
+    if(!localStorage.getItem('isLoggedIn')) {
+      const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+      loginModal.show();
+    }
+  });
+
+// --- Login ---
+document.getElementById('loginForm').addEventListener('submit', async e=>{
+  e.preventDefault();
+  const username = document.getElementById('usernameInput').value.trim();
+  const password = document.getElementById('passwordInput').value.trim();
+  
+  const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQXOP4L2k61miTcFTlb4r0QigIWRsMzVazznXCbNLqaHBpwY9RKgjnXdW4figjJZLmrrPcXbU6Q1f-E/pub?gid=1201461529&single=true&output=csv";
+  const res = await fetch(url);
+  const csvText = await res.text();
+  const lines = csvText.split("\n").slice(1); // skip header
+  let valid = false;
+  for(let l of lines) {
+    const cols = l.split(",");
+    const u = cols[2]?.trim();
+    const p = cols[3]?.trim();
+    if(username===u && password===p) { valid=true; break; }
+  }
+
+  if(valid){
+    localStorage.setItem('isLoggedIn','true');
+    localStorage.setItem('loggedUser',username);
+    const loginModal = bootstrap.Modal.getInstance(document.getElementById('loginModal'));
+    loginModal.hide();
+    document.getElementById('userName').textContent = username;
+  } else {
+    document.getElementById('loginError').style.display='block';
+  }
+});
+
+// --- Logout Modal ---
+function initLogoutModal() {
+  const logoutBtn = document.getElementById('logoutBtn');
+  if (!logoutBtn) return;
+  logoutBtn.addEventListener('click', () => {
+    const logoutModal = new bootstrap.Modal(document.getElementById('logoutModal'));
+    logoutModal.show();
+  });
+
+  document.getElementById('confirmLogout').addEventListener('click', () => {
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('loggedUser');
+    const logoutModal = bootstrap.Modal.getInstance(document.getElementById('logoutModal'));
+    logoutModal.hide();
+    window.location.href = "index.html";
+  });
+}
+setTimeout(initLogoutModal,500); // delay supaya navbar sudah dimuat
+
+// ----- DATA SISWA -----
+const kelasSiswa = {"7A":["Ahmad","Budi","Citra"],"7B":["Dewi","Eka","Fajar"]};
+const tbody = document.querySelector('#siswaTable tbody');
+
+// Load select options (contoh, bisa disesuaikan CSV lain)
+const waliKelasSelect = document.getElementById('waliKelas');
+const kelasSelect = document.getElementById('kelas');
+const mataPelajaranSelect = document.getElementById('mataPelajaran');
+['Pak Arif','Bu Sari'].forEach(w=>waliKelasSelect.innerHTML+=`<option value="${w}">${w}</option>`);
+Object.keys(kelasSiswa).forEach(k=>kelasSelect.innerHTML+=`<option value="${k}">${k}</option>`);
+['Matematika','IPA','IPS'].forEach(m=>mataPelajaranSelect.innerHTML+=`<option value="${m}">${m}</option>`);
+
+// Render siswa saat pilih kelas
+kelasSelect.addEventListener('change',()=> {
+  const selectedKelas = kelasSelect.value;
+  tbody.innerHTML = '';
+  if(!selectedKelas) return;
+  const siswaArr = kelasSiswa[selectedKelas] || [];
+  siswaArr.forEach((s,i)=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${i+1}</td>
+                    <td>${s}</td>
+                    <td>
+                      <select class="form-select status-select">
+                        <option value="Tuntas">Tuntas</option>
+                        <option value="Ujian">Ujian</option>
+                      </select>
+                    </td>`;
+    tbody.appendChild(tr);
+  });
+});
+
+// Tombol Tuntas / Ujian Semua
+document.getElementById('tuntasAllBtn').addEventListener('click',()=>{document.querySelectorAll('.status-select').forEach(s=>s.value='Tuntas');});
+document.getElementById('ujianAllBtn').addEventListener('click',()=>{document.querySelectorAll('.status-select').forEach(s=>s.value='Ujian');});
+
+// Simpan data (simulasi)
+document.getElementById('saveBtn').addEventListener('click',()=>{
+  const tanggal = document.getElementById('tanggal').value;
+  const waliKelas = waliKelasSelect.value;
+  const mapel = mataPelajaranSelect.value;
+  const kelas = kelasSelect.value;
+  const rows = document.querySelectorAll('#siswaTable tbody tr');
+  const dataToSave = [];
+  rows.forEach((row,i)=>{
+    const nama = row.children[1].textContent;
+    const status = row.children[2].querySelector('select').value;
+    dataToSave.push({Tanggal:tanggal, Wali_Kelas:waliKelas, Mata_Pelajaran:mapel, Kelas:kelas, Nama_Siswa:nama, Status:status});
+  });
+  console.log("Data disimpan ke spreadsheet:", dataToSave);
+  alert("Data siap disimpan ke Google Spreadsheet (simulasi)");
+});
+</script>
+</body>
+</html>
