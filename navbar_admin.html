@@ -14,12 +14,65 @@
           <a class="nav-link" href="admin_rekap.html">Rekap Data KBM</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="https://soalbank317-del.github.io/sialan/index.html" id="logoutBtn">Logout</a>
+          <a class="nav-link" href="#" id="logoutBtn">Logout</a>
         </li>
       </ul>
     </div>
   </div>
 </nav>
 
+<!-- Overlay Blur -->
+<div id="overlayBlur" 
+     class="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 d-none" 
+     style="backdrop-filter: blur(4px); z-index: 1999;">
+</div>
 
+<!-- Toast Konfirmasi Logout -->
+<div class="position-fixed top-50 start-50 translate-middle p-3 d-none" id="toastWrapper" style="z-index: 2000;">
+  <div id="logoutToast" class="toast align-items-center text-white bg-danger border-0 show" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header bg-danger text-white">
+      <strong class="me-auto">Konfirmasi Logout</strong>
+      <button type="button" class="btn-close btn-close-white" id="closeToast"></button>
+    </div>
+    <div class="toast-body">
+      Anda yakin ingin logout?
+      <div class="mt-3 text-center">
+        <button type="button" class="btn btn-light btn-sm me-2" id="confirmLogout">Ya, Logout</button>
+        <button type="button" class="btn btn-outline-light btn-sm" id="cancelLogout">Batal</button>
+      </div>
+    </div>
+  </div>
+</div>
 
+<!-- Script -->
+<script>
+const overlay = document.getElementById('overlayBlur');
+const toastWrapper = document.getElementById('toastWrapper');
+const logoutBtn = document.getElementById('logoutBtn');
+const closeToast = document.getElementById('closeToast');
+const cancelLogout = document.getElementById('cancelLogout');
+const confirmLogout = document.getElementById('confirmLogout');
+
+function showLogoutToast() {
+  overlay.classList.remove('d-none');
+  toastWrapper.classList.remove('d-none');
+}
+
+function hideLogoutToast() {
+  overlay.classList.add('d-none');
+  toastWrapper.classList.add('d-none');
+}
+
+logoutBtn.addEventListener('click', function(e) {
+  e.preventDefault();
+  showLogoutToast();
+});
+
+closeToast.addEventListener('click', hideLogoutToast);
+cancelLogout.addEventListener('click', hideLogoutToast);
+overlay.addEventListener('click', hideLogoutToast);
+
+confirmLogout.addEventListener('click', function() {
+  window.location.href = "https://soalbank317-del.github.io/sialan/index.html";
+});
+</script>
