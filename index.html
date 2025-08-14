@@ -136,8 +136,11 @@ document.getElementById('loginForm').addEventListener('submit', function(e) {
   e.preventDefault();
   const usernameInput = document.getElementById('username').value.trim();
   const passwordInput = document.getElementById('password').value.trim();
-  const validUser = userData.find(user => user['Username'] === usernameInput && user['Password'] === passwordInput);
-  console.log("Login dicoba:", usernameInput, passwordInput, validUser); // debug
+
+  const validUser = userData.find(user =>
+    user['Username'] === usernameInput && user['Password'] === passwordInput
+  );
+
   if(validUser) {
     sessionStorage.setItem('user', usernameInput);
     window.location.href = 'admin_input.html';
@@ -192,3 +195,4 @@ fetchSheetData().then(data => {
 
 </body>
 </html>
+
