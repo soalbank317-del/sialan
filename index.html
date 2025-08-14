@@ -1,7 +1,7 @@
 <section class="container my-4">
   <h2 class="mb-4">Statistik KBM Siswa</h2>
   <div class="table-responsive">
-    <table class="table table-bordered table-striped">
+    <table class="table table-bordered table-striped align-middle">
       <thead class="table-dark">
         <tr>
           <th>Mata Pelajaran</th>
@@ -11,7 +11,7 @@
         </tr>
       </thead>
       <tbody id="dataTable">
-        <!-- Data akan diisi lewat JavaScript -->
+        <!-- Data diisi lewat JS -->
       </tbody>
     </table>
   </div>
@@ -24,7 +24,7 @@ fetch('navbar_publik.html')
   .then(html => document.getElementById('navbar').innerHTML = html)
   .then(()=> feather.replace());
 
-// Fetch CSV Data
+// Ambil data CSV
 async function fetchSheetData() {
   const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQAEwBLEhaehGYlzYsNhBPfmozGvRZmpjyEOHC8rfgduB0JRurz-xwI_jfW8Fw8Vaz93a_E9tLyuIX9/pub?gid=0&single=true&output=csv";
   const res = await fetch(url);
@@ -34,14 +34,13 @@ async function fetchSheetData() {
   return lines.slice(1).map(line=>{
     const vals = line.split(",");
     const obj = {};
-    headers.forEach((h,i)=>obj[h.trim()]=vals[i]?.trim() ?? "");
+    headers.forEach((h,i)=>obj[h.trim()] = vals[i]?.trim() ?? "");
     return obj;
   });
 }
 
-// Render Table
+// Render tabel
 fetchSheetData().then(data=>{
-  // Ambil kombinasi unik Mata Pelajaran + Kelas
   const grouped = {};
   data.forEach(d=>{
     const key = `${d.Mata_Pelajaran}||${d.Kelas}`;
@@ -50,7 +49,6 @@ fetchSheetData().then(data=>{
     if(d.Status === "Ujian")  grouped[key].ujian++;
   });
 
-  // Masukkan ke tabel
   const tbody = document.getElementById('dataTable');
   Object.values(grouped).forEach(row=>{
     const tr = document.createElement('tr');
