@@ -8,28 +8,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 body { font-family: "Inter", sans-serif; background-color: #f8f9fa; color: #2c3e50; }
-footer { text-align: center; padding: 20px 0; font-size: 0.9rem; color: #6c757d; border-top: 1px solid #e9ecef; background: linear-gradient(90deg,#ffffff,#f8f8f8); box-shadow: 0 -2px 6px rgba(0,0,0,0.04);}
 .card { border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); padding: 20px; }
-.table-hover tbody tr:hover { background-color: #f1f3f5; }
 </style>
 </head>
 <body>
 
-<!-- Navbar -->
 <div id="navbarContainer"></div>
 
-<!-- Form Input KBM -->
 <section class="container my-4">
   <div class="card">
     <h3 class="mb-3">Form Input Data KBM</h3>
-
-    <!-- Info Wali Kelas -->
-    <div class="mb-3">
-      <strong>Nama Wali Kelas:</strong> <span id="userName">Admin</span><br>
-      <strong>Kelas:</strong> <span id="userKelas">7A</span>
-    </div>
-
-    <!-- Form Input -->
     <div class="table-responsive">
       <table class="table table-bordered table-hover">
         <thead>
@@ -38,49 +26,46 @@ footer { text-align: center; padding: 20px 0; font-size: 0.9rem; color: #6c757d;
             <th>Wali Kelas</th>
             <th>Mata Pelajaran</th>
             <th>Kelas</th>
-            <th>Nama Siswa</th>
-            <th>Status</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td><input type="date" id="tanggal" class="form-control"></td>
             <td>
-              <select id="waliKelas" class="form-select">
-                <option value="">Pilih Wali Kelas</option>
-              </select>
+              <select id="waliKelas" class="form-select"><option value="">Pilih Wali Kelas</option></select>
             </td>
             <td>
-              <select id="mataPelajaran" class="form-select">
-                <option value="">Pilih Mata Pelajaran</option>
-              </select>
+              <select id="mataPelajaran" class="form-select"><option value="">Pilih Mata Pelajaran</option></select>
             </td>
             <td>
-              <select id="kelas" class="form-select">
-                <option value="">Pilih Kelas</option>
-              </select>
-            </td>
-            <td style="display:none;">
-              <select id="namaSiswa" class="form-select">
-                <option value="">Pilih Siswa</option>
-              </select>
-            </td>
-            <td style="display:none;">
-              <select id="status" class="form-select">
-                <option value="Tuntas">Tuntas</option>
-                <option value="Ujian">Ujian</option>
-              </select>
+              <select id="kelas" class="form-select"><option value="">Pilih Kelas</option></select>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
-
-    <button class="btn btn-primary mt-3" id="saveBtn">Simpan Data</button>
   </div>
 </section>
 
-<footer>
+<!-- Modal Pilih Siswa -->
+<div class="modal fade" id="siswaModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Pilih Nama Siswa & Status</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="siswaForm"></form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="saveSiswaBtn">Simpan</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="text-center mt-3">
   © 2025 SIALAN – Sistem Analisis Laporan KBM Siswa
 </footer>
 
@@ -88,26 +73,26 @@ footer { text-align: center; padding: 20px 0; font-size: 0.9rem; color: #6c757d;
 <script>
 // Load Navbar
 fetch('navbar_admin.html')
-  .then(res => res.text())
-  .then(html => document.getElementById('navbarContainer').innerHTML = html);
+.then(res => res.text())
+.then(html => document.getElementById('navbarContainer').innerHTML = html);
 
-// Elemen form
+// Elemen
 const waliKelasSelect = document.getElementById('waliKelas');
 const kelasSelect = document.getElementById('kelas');
 const mataPelajaranSelect = document.getElementById('mataPelajaran');
-const namaSiswaSelect = document.getElementById('namaSiswa');
-const statusSelect = document.getElementById('status');
+const siswaForm = document.getElementById('siswaForm');
+const saveSiswaBtn = document.getElementById('saveSiswaBtn');
 
-// --- Fetch Wali Kelas & Kelas dari Spreadsheet ---
+// --- Fetch Wali Kelas & Kelas ---
 fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vQXOP4L2k61miTcFTlb4r0QigIWRsMzVazznXCbNLqaHBpwY9RKgjnXdW4figjJZLmrrPcXbU6Q1f-E/pub?gid=0&single=true&output=csv')
 .then(res => res.text())
 .then(csvText => {
-    const lines = csvText.split("\n").slice(1); // mulai dari baris ke-2
+    const lines = csvText.split("\n").slice(1);
     const kelasSet = new Set();
     lines.forEach(line=>{
         const cols = line.split(",");
-        const wali = cols[0]?.trim(); // kolom A
-        const kelas = cols[1]?.trim(); // kolom B
+        const wali = cols[0]?.trim();
+        const kelas = cols[1]?.trim();
         if(wali) waliKelasSelect.innerHTML += `<option value="${wali}">${wali}</option>`;
         if(kelas && !kelasSet.has(kelas)) {
           kelasSelect.innerHTML += `<option value="${kelas}">${kelas}</option>`;
@@ -116,7 +101,7 @@ fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vQXOP4L2k61miTcFTlb4r0Qig
     });
 });
 
-// --- Fetch Mata Pelajaran dari Spreadsheet ---
+// --- Fetch Mata Pelajaran ---
 fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vQXOP4L2k61miTcFTlb4r0QigIWRsMzVazznXCbNLqaHBpwY9RKgjnXdW4figjJZLmrrPcXbU6Q1f-E/pub?gid=1451676013&single=true&output=csv')
 .then(res => res.text())
 .then(csvText => {
@@ -128,55 +113,44 @@ fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vQXOP4L2k61miTcFTlb4r0Qig
     });
 });
 
-// --- Data Siswa per Kelas (disembunyikan awal) ---
+// --- Contoh Data siswa per kelas ---
 const siswaPerKelas = {
   "7A":["Ahmad","Budi","Citra"],
   "7B":["Dewi","Eka","Fajar"]
 };
 
-// Tampilkan dropdown Nama Siswa setelah pilih kelas
+// --- Show Modal saat pilih kelas ---
 kelasSelect.addEventListener('change', ()=>{
   const k = kelasSelect.value;
-  if(siswaPerKelas[k]){
-    namaSiswaSelect.innerHTML = '<option value="">Pilih Siswa</option>';
-    siswaPerKelas[k].forEach(s => {
-      namaSiswaSelect.innerHTML += `<option value="${s}">${s}</option>`;
-    });
-    namaSiswaSelect.parentElement.style.display = ''; // munculkan dropdown
-    statusSelect.parentElement.style.display = ''; // munculkan status
-  } else {
-    namaSiswaSelect.parentElement.style.display = 'none';
-    statusSelect.parentElement.style.display = 'none';
-  }
+  if(!k) return;
+
+  siswaForm.innerHTML = '';
+  const siswaList = siswaPerKelas[k] || [];
+  siswaList.forEach(s=>{
+    const div = document.createElement('div');
+    div.classList.add('mb-2');
+    div.innerHTML = `
+      <label>${s}</label>
+      <select class="form-select" data-siswa="${s}">
+        <option value="Tuntas">Tuntas</option>
+        <option value="Ujian">Ujian</option>
+      </select>
+    `;
+    siswaForm.appendChild(div);
+  });
+
+  const siswaModal = new bootstrap.Modal(document.getElementById('siswaModal'));
+  siswaModal.show();
 });
 
-// --- Simpan data ke Google Spreadsheet via Apps Script ---
-document.getElementById('saveBtn').addEventListener('click', ()=>{
-  const formData = {
-    tanggal: document.getElementById('tanggal').value,
-    waliKelas: waliKelasSelect.value,
-    mapel: mataPelajaranSelect.value,
-    kelas: kelasSelect.value,
-    namaSiswa: namaSiswaSelect.value,
-    status: statusSelect.value
-  };
-
-  if(!formData.tanggal || !formData.waliKelas || !formData.mapel || !formData.kelas || !formData.namaSiswa){
-    alert("Lengkapi semua field!");
-    return;
-  }
-
-  fetch('YOUR_WEB_APP_URL', { // ganti dengan URL Apps Script Web App
-    method: 'POST',
-    body: JSON.stringify(formData),
-    headers: { 'Content-Type': 'application/json' }
-  })
-  .then(res => res.json())
-  .then(res => {
-    if(res.result==="success") alert("Data berhasil disimpan!");
-    else alert("Gagal menyimpan data.");
-  })
-  .catch(err => { console.error(err); alert("Terjadi error saat menyimpan."); });
+// --- Simpan data siswa & status ---
+saveSiswaBtn.addEventListener('click', ()=>{
+  const dataSiswa = [];
+  siswaForm.querySelectorAll('select').forEach(sel=>{
+    dataSiswa.push({nama: sel.dataset.siswa, status: sel.value});
+  });
+  console.log("Data siswa & status:", dataSiswa);
+  alert("Data siswa & status berhasil dipilih!");
 });
 </script>
 </body>
