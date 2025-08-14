@@ -3,85 +3,81 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SIALAN – Admin Input KBM</title>
+<title>SIALAN – Input Data KBM</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-/* Tombol Phoenix Glossy */
-.btn-phoenix {
-    font-weight: 600;
-    border-radius: 12px;
-    transition: all 0.25s ease-in-out;
-    padding: 0.6rem 1.4rem;
-    margin-right: 10px;
-    cursor: pointer;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-    border: none;
-    color: #fff;
-}
-.btn-tuntas { background: linear-gradient(145deg,#28a745,#198754);}
-.btn-tuntas:hover { transform: translateY(-2px); box-shadow:0 8px 22px rgba(0,0,0,0.12);}
-.btn-ujian { background: linear-gradient(145deg,#dc3545,#b02a37);}
-.btn-ujian:hover { transform: translateY(-2px); box-shadow:0 8px 22px rgba(0,0,0,0.12);}
-.profile-img {width:50px; height:50px; border-radius:50%;}
+body { font-family: "Inter", sans-serif; background-color: #f8f9fa; color: #2c3e50; }
+footer { text-align: center; padding: 20px 0; font-size: 0.9rem; color: #6c757d; border-top: 1px solid #e9ecef; background: linear-gradient(90deg,#ffffff,#f8f8f8); box-shadow: 0 -2px 6px rgba(0,0,0,0.04);}
+.card { border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); padding: 20px; }
+.table-hover tbody tr:hover { background-color: #f1f3f5; }
 </style>
 </head>
 <body>
 
-<!-- Navbar Admin -->
+<!-- Navbar -->
 <div id="navbarContainer"></div>
 
-<!-- Konten Admin -->
+<!-- Form Input KBM -->
 <section class="container my-4">
-<div class="d-flex align-items-center mb-4">
-    <img src="https://drive.google.com/file/d/1SMsQrY1Q9L-NRMcmJIk7y1msb5YFcOzM/view?usp=drive_link" alt="Profil" class="profile-img me-3">
-    <div>
-      <div>Nama Wali Kelas: <span id="userName">Admin</span></div>
-      <div>Kelas: <span id="userKelas">7A</span></div>
+  <div class="card">
+    <h3 class="mb-3">Form Input Data KBM</h3>
+
+    <!-- Info Wali Kelas -->
+    <div class="mb-3">
+      <strong>Nama Wali Kelas:</strong> <span id="userName">Admin</span><br>
+      <strong>Kelas:</strong> <span id="userKelas">7A</span>
     </div>
-</div>
 
-<h3 class="mb-4">Input Data KBM</h3>
+    <!-- Form Input -->
+    <div class="table-responsive">
+      <table class="table table-bordered table-hover">
+        <thead>
+          <tr>
+            <th>Tanggal</th>
+            <th>Wali Kelas</th>
+            <th>Mata Pelajaran</th>
+            <th>Kelas</th>
+            <th>Nama Siswa</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><input type="date" id="tanggal" class="form-control"></td>
+            <td>
+              <select id="waliKelas" class="form-select">
+                <option value="">Pilih Wali Kelas</option>
+              </select>
+            </td>
+            <td>
+              <select id="mataPelajaran" class="form-select">
+                <option value="">Pilih Mata Pelajaran</option>
+              </select>
+            </td>
+            <td>
+              <select id="kelas" class="form-select">
+                <option value="">Pilih Kelas</option>
+              </select>
+            </td>
+            <td>
+              <select id="namaSiswa" class="form-select">
+                <option value="">Pilih Siswa</option>
+              </select>
+            </td>
+            <td>
+              <select id="status" class="form-select">
+                <option value="Tuntas">Tuntas</option>
+                <option value="Ujian">Ujian</option>
+              </select>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-<div class="row mb-3">
-  <div class="col-md-2">
-    <input type="date" id="tanggal" class="form-control" required>
+    <button class="btn btn-primary mt-3" id="saveBtn">Simpan Data</button>
   </div>
-  <div class="col-md-3">
-    <select id="waliKelas" class="form-select" required>
-      <option value="">Wali Kelas</option>
-    </select>
-  </div>
-  <div class="col-md-3">
-    <select id="mataPelajaran" class="form-select" required>
-      <option value="">Mata Pelajaran</option>
-    </select>
-  </div>
-  <div class="col-md-2">
-    <select id="kelas" class="form-select" required>
-      <option value="">Kelas</option>
-    </select>
-  </div>
-</div>
-
-<div class="mb-3 d-flex">
-  <button class="btn btn-success me-2" id="tuntasAllBtn">Tuntas Semua</button>
-  <button class="btn btn-danger" id="ujianAllBtn">Ujian Semua</button>
-</div>
-
-<div class="table-responsive">
-  <table class="table table-striped table-bordered" id="siswaTable">
-    <thead>
-      <tr>
-        <th>No</th>
-        <th>Nama Siswa</th>
-        <th>Status</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-</div>
-
-<button class="btn btn-info w-100 mt-3" id="saveBtn">Simpan Semua</button>
 </section>
 
 <footer>
@@ -90,35 +86,39 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-// Load Navbar Admin
+// Load Navbar
 fetch('navbar_admin.html')
   .then(res => res.text())
   .then(html => document.getElementById('navbarContainer').innerHTML = html);
 
-// Dropdown Wali Kelas dan Kelas dari spreadsheet
 const waliKelasSelect = document.getElementById('waliKelas');
 const kelasSelect = document.getElementById('kelas');
 const mataPelajaranSelect = document.getElementById('mataPelajaran');
+const namaSiswaSelect = document.getElementById('namaSiswa');
 
-// --- Wali Kelas & Kelas ---
+// --- Fetch Wali Kelas & Kelas ---
 fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vQXOP4L2k61miTcFTlb4r0QigIWRsMzVazznXCbNLqaHBpwY9RKgjnXdW4figjJZLmrrPcXbU6Q1f-E/pub?gid=1201461529&single=true&output=csv')
 .then(res => res.text())
 .then(csvText => {
-    const lines = csvText.split("\n").slice(1); // skip header
+    const lines = csvText.split("\n").slice(1);
+    const kelasSet = new Set();
     lines.forEach(line=>{
         const cols = line.split(",");
         const wali = cols[0]?.trim();
         const kelas = cols[1]?.trim();
         if(wali) waliKelasSelect.innerHTML += `<option value="${wali}">${wali}</option>`;
-        if(kelas) kelasSelect.innerHTML += `<option value="${kelas}">${kelas}</option>`;
+        if(kelas && !kelasSet.has(kelas)) {
+          kelasSelect.innerHTML += `<option value="${kelas}">${kelas}</option>`;
+          kelasSet.add(kelas);
+        }
     });
 });
 
-// --- Mata Pelajaran ---
+// --- Fetch Mata Pelajaran ---
 fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vQXOP4L2k61miTcFTlb4r0QigIWRsMzVazznXCbNLqaHBpwY9RKgjnXdW4figjJZLmrrPcXbU6Q1f-E/pub?gid=1451676013&single=true&output=csv')
 .then(res => res.text())
 .then(csvText => {
-    const lines = csvText.split("\n").slice(1); // skip header
+    const lines = csvText.split("\n").slice(1);
     lines.forEach(line=>{
         const cols = line.split(",");
         const mapel = cols[0]?.trim();
@@ -126,49 +126,50 @@ fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vQXOP4L2k61miTcFTlb4r0Qig
     });
 });
 
-// Contoh Data Siswa (bisa diganti dinamis nanti)
-const kelasSiswa = {"7A":["Ahmad","Budi","Citra"],"7B":["Dewi","Eka","Fajar"]};
-const tbody = document.querySelector('#siswaTable tbody');
+// --- Contoh Data Siswa per Kelas (untuk dropdown dinamis) ---
+const siswaPerKelas = {
+  "7A":["Ahmad","Budi","Citra"],
+  "7B":["Dewi","Eka","Fajar"]
+};
 
-// Render siswa saat pilih kelas
-kelasSelect.addEventListener('change',()=> {
-  const selectedKelas = kelasSelect.value;
-  tbody.innerHTML = '';
-  if(!selectedKelas) return;
-  const siswaArr = kelasSiswa[selectedKelas] || [];
-  siswaArr.forEach((s,i)=>{
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${i+1}</td>
-                    <td>${s}</td>
-                    <td>
-                      <select class="form-select status-select">
-                        <option value="Tuntas">Tuntas</option>
-                        <option value="Ujian">Ujian</option>
-                      </select>
-                    </td>`;
-    tbody.appendChild(tr);
-  });
+// Update nama siswa saat pilih kelas
+kelasSelect.addEventListener('change', ()=>{
+  const k = kelasSelect.value;
+  namaSiswaSelect.innerHTML = '<option value="">Pilih Siswa</option>';
+  if(siswaPerKelas[k]){
+    siswaPerKelas[k].forEach(s => {
+      namaSiswaSelect.innerHTML += `<option value="${s}">${s}</option>`;
+    });
+  }
 });
 
-// Tombol Tuntas / Ujian Semua
-document.getElementById('tuntasAllBtn').addEventListener('click',()=>{document.querySelectorAll('.status-select').forEach(s=>s.value='Tuntas');});
-document.getElementById('ujianAllBtn').addEventListener('click',()=>{document.querySelectorAll('.status-select').forEach(s=>s.value='Ujian');});
+// Simpan data ke Google Spreadsheet via Apps Script
+document.getElementById('saveBtn').addEventListener('click', ()=>{
+  const formData = {
+    tanggal: document.getElementById('tanggal').value,
+    waliKelas: waliKelasSelect.value,
+    mapel: mataPelajaranSelect.value,
+    kelas: kelasSelect.value,
+    namaSiswa: namaSiswaSelect.value,
+    status: document.getElementById('status').value
+  };
 
-// Simpan data (simulasi)
-document.getElementById('saveBtn').addEventListener('click',()=>{
-  const tanggal = document.getElementById('tanggal').value;
-  const waliKelas = waliKelasSelect.value;
-  const mapel = mataPelajaranSelect.value;
-  const kelas = kelasSelect.value;
-  const rows = document.querySelectorAll('#siswaTable tbody tr');
-  const dataToSave = [];
-  rows.forEach((row,i)=>{
-    const nama = row.children[1].textContent;
-    const status = row.children[2].querySelector('select').value;
-    dataToSave.push({Tanggal:tanggal, Wali_Kelas:waliKelas, Mata_Pelajaran:mapel, Kelas:kelas, Nama_Siswa:nama, Status:status});
-  });
-  console.log("Data siap disimpan ke spreadsheet:", dataToSave);
-  alert("Data siap disimpan ke Google Spreadsheet (simulasi)");
+  if(!formData.tanggal || !formData.waliKelas || !formData.mapel || !formData.kelas || !formData.namaSiswa){
+    alert("Lengkapi semua field!");
+    return;
+  }
+
+  fetch('YOUR_WEB_APP_URL', { // ganti dengan URL Apps Script Web App
+    method: 'POST',
+    body: JSON.stringify(formData),
+    headers: { 'Content-Type': 'application/json' }
+  })
+  .then(res => res.json())
+  .then(res => {
+    if(res.result==="success") alert("Data berhasil disimpan!");
+    else alert("Gagal menyimpan data.");
+  })
+  .catch(err => { console.error(err); alert("Terjadi error saat menyimpan."); });
 });
 </script>
 </body>
