@@ -9,8 +9,8 @@
 <style>
 body {
     font-family: "Inter", sans-serif;
-    background-color: #fdfdfd;
-    color: #2c3e50;
+    background-color: #f8f9fa; /* sama seperti versi kedua */
+    color: #2c3e50; /* teks biru gelap */
 }
 footer {
     text-align: center;
@@ -27,7 +27,7 @@ footer {
     padding: 20px;
 }
 .table-hover tbody tr:hover {
-    background-color: #f1f3f5;
+    background-color: #f1f3f5; /* hover sama seperti versi kedua */
 }
 </style>
 </head>
@@ -69,17 +69,18 @@ footer {
 fetch('navbar_publik.html')
   .then(res => res.text())
   .then(html => document.getElementById('navbarContainer').innerHTML = html);
+
 // Ambil data CSV dan render tabel
 async function fetchSheetData() {
   const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQAEwBLEhaehGYlzYsNhBPfmozGvRZmpjyEOHC8rfgduB0JRurz-xwI_jfW8Fw8Vaz93a_E9tLyuIX9/pub?gid=0&single=true&output=csv";
   const res = await fetch(url);
   const csvText = await res.text();
   const lines = csvText.split("\n").filter(l => l.trim() !== "");
-  const headers = lines[0].split(",");
+  const headers = lines[0].split(",").map(h => h.trim());
   return lines.slice(1).map(line => {
     const vals = line.split(",");
     const obj = {};
-    headers.forEach((h,i) => obj[h.trim()] = vals[i]?.trim() ?? "");
+    headers.forEach((h,i) => obj[h] = vals[i]?.trim() ?? "");
     return obj;
   });
 }
@@ -89,22 +90,27 @@ fetchSheetData().then(data => {
   data.forEach(d => {
     const key = `${d.Mata_Pelajaran}||${d.Kelas}`;
     if(!grouped[key]) grouped[key] = {mapel:d.Mata_Pelajaran, kelas:d.Kelas, tuntas:0, ujian:0};
-    if(d.Status==="Tuntas") grouped[key].tuntas++;
-    if(d.Status==="Ujian") grouped[key].ujian++;
+    const status = (d.Status || "").trim();
+    if(status === "Tuntas") grouped[key].tuntas++;
+    if(status === "Ujian") grouped[key].ujian++;
   });
 
   const tbody = document.getElementById('dataTable');
   tbody.innerHTML = "";
-  Object.values(grouped).forEach(row => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${row.mapel}</td>
-      <td>${row.kelas}</td>
-      <td class="tuntas-cell">${row.tuntas}</td>
-      <td class="ujian-cell">${row.ujian}</td>
-    `;
-    tbody.appendChild(tr);
-  });
+  if(Object.keys(grouped).length === 0){
+      tbody.innerHTML = '<tr><td colspan="4" class="text-center">Data tidak tersedia</td></tr>';
+  } else {
+      Object.values(grouped).forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${row.mapel}</td>
+          <td>${row.kelas}</td>
+          <td class="tuntas-cell">${row.tuntas}</td>
+          <td class="ujian-cell">${row.ujian}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+  }
 });
 </script>
 
