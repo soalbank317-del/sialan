@@ -1,134 +1,152 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Input Data KBM</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f8f9fa;
-        }
-        footer {
-            text-align: center;
-            padding: 20px 0;
-            font-size: 0.9rem;
-            color: #6c757d;
-            border-top: 1px solid #e9ecef;
-            background: linear-gradient(90deg, #ffffff, #f8f8f8);
-            box-shadow: 0 -2px 6px rgba(0,0,0,0.04);
-        }
-        .card {
-            border-radius: 15px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-            padding: 20px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIALAN – Input Data KBM</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+body { font-family: "Inter", sans-serif; background-color: #f8f9fa; color: #2c3e50; }
+footer { text-align: center; padding: 20px 0; font-size: 0.9rem; color: #6c757d; border-top: 1px solid #e9ecef; background: linear-gradient(90deg,#ffffff,#f8f8f8); box-shadow: 0 -2px 6px rgba(0,0,0,0.04);}
+.card { border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); padding: 20px; }
+.table-hover tbody tr:hover { background-color: #f1f3f5; }
+</style>
 </head>
 <body>
 
-<!-- Navbar Admin -->
+<!-- Navbar -->
 <div id="navbarContainer"></div>
 
-<!-- Form Input Data KBM -->
+<!-- Form Input KBM -->
 <section class="container my-4">
-    <div class="card">
-        <h3 class="mb-3">Form Input Data KBM</h3>
+  <div class="card">
+    <h3 class="mb-3">Form Input Data KBM</h3>
 
-        <!-- Info Wali Kelas -->
-        <div class="mb-3">
-            <strong>Nama Wali Kelas:</strong> <span id="userName">Admin</span><br>
-            <strong>Kelas:</strong> <span id="userKelas">7A</span>
-        </div>
-
-        <!-- Form Input -->
-        <form id="kbmForm">
-            <div class="mb-3">
-                <label for="tanggal" class="form-label">Tanggal</label>
-                <input type="text" class="form-control" id="tanggal" name="tanggal" readonly>
-            </div>
-            <div class="mb-3">
-                <label for="mapel" class="form-label">Mata Pelajaran</label>
-                <select class="form-select" id="mapel" name="mapel" required>
-                    <option value="">Pilih Mata Pelajaran</option>
-                    <option>Matematika</option>
-                    <option>IPA</option>
-                    <option>IPS</option>
-                    <option>Bahasa Indonesia</option>
-                    <option>Bahasa Inggris</option>
-                </select>
-            </div>
-            <div class="mb-3">
-                <label for="namaSiswa" class="form-label">Nama Siswa</label>
-                <select class="form-select" id="namaSiswa" name="namaSiswa" required>
-                    <option value="">Pilih Nama Siswa</option>
-                    <option>Andi</option>
-                    <option>Budi</option>
-                    <option>Citra</option>
-                    <option>Dewi</option>
-                </select>
-            </div>
-            <div class="mb-3">
-                <label for="status" class="form-label">Status</label>
-                <select class="form-select" id="status" name="status" required>
-                    <option value="">Pilih Status</option>
-                    <option>Selesai</option>
-                    <option>Belum</option>
-                </select>
-            </div>
-            <button type="submit" class="btn btn-primary">Simpan</button>
-        </form>
+    <!-- Info Wali Kelas -->
+    <div class="mb-3">
+      <strong>Nama Wali Kelas:</strong> <span id="userName">Admin</span><br>
+      <strong>Kelas:</strong> <span id="userKelas">7A</span>
     </div>
+
+    <!-- Form Input -->
+    <div class="table-responsive">
+      <table class="table table-bordered table-hover">
+        <thead>
+          <tr>
+            <th>Tanggal</th>
+            <th>Wali Kelas</th>
+            <th>Mata Pelajaran</th>
+            <th>Kelas</th>
+            <th>Nama Siswa</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><input type="date" id="tanggal" class="form-control"></td>
+            <td>
+              <select id="waliKelas" class="form-select">
+                <option value="">Pilih Wali Kelas</option>
+                <option value="Pak Arif">Pak Arif</option>
+                <option value="Bu Sari">Bu Sari</option>
+              </select>
+            </td>
+            <td>
+              <select id="mataPelajaran" class="form-select">
+                <option value="">Pilih Mata Pelajaran</option>
+                <option value="Matematika">Matematika</option>
+                <option value="IPA">IPA</option>
+                <option value="IPS">IPS</option>
+              </select>
+            </td>
+            <td>
+              <select id="kelas" class="form-select">
+                <option value="">Pilih Kelas</option>
+                <option value="7A">7A</option>
+                <option value="7B">7B</option>
+              </select>
+            </td>
+            <td>
+              <select id="namaSiswa" class="form-select">
+                <option value="">Pilih Siswa</option>
+              </select>
+            </td>
+            <td>
+              <select id="status" class="form-select">
+                <option value="Tuntas">Tuntas</option>
+                <option value="Ujian">Ujian</option>
+              </select>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <button class="btn btn-primary mt-3" id="saveBtn">Simpan Data</button>
+  </div>
 </section>
 
 <footer>
-    © 2025 SIALAN – Sistem Analisis Laporan KBM Siswa
+  © 2025 SIALAN – Sistem Analisis Laporan KBM Siswa
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-// Set tanggal otomatis format dd/mm/yyyy hh:mm:ss
-function setTanggalNow() {
-    let now = new Date();
-    let day = String(now.getDate()).padStart(2, '0');
-    let month = String(now.getMonth() + 1).padStart(2, '0');
-    let year = now.getFullYear();
-    let hours = String(now.getHours()).padStart(2, '0');
-    let minutes = String(now.getMinutes()).padStart(2, '0');
-    let seconds = String(now.getSeconds()).padStart(2, '0');
-    document.getElementById('tanggal').value = `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
-}
-setTanggalNow();
+// Load Navbar
+fetch('navbar_admin.html')
+  .then(res => res.text())
+  .then(html => document.getElementById('navbarContainer').innerHTML = html);
 
-// Kirim data ke Google Apps Script
-document.getElementById('kbmForm').addEventListener('submit', function(e) {
-    e.preventDefault();
+// Data siswa per kelas
+const siswaPerKelas = {
+  "7A": ["Ahmad", "Budi", "Citra"],
+  "7B": ["Dewi", "Eka", "Fajar"]
+};
 
-    let formData = {
-        tanggal: document.getElementById('tanggal').value,
-        waliKelas: document.getElementById('userName').textContent,
-        mapel: document.getElementById('mapel').value,
-        kelas: document.getElementById('userKelas').textContent,
-        namaSiswa: document.getElementById('namaSiswa').value,
-        status: document.getElementById('status').value
-    };
+const kelasSelect = document.getElementById('kelas');
+const namaSiswaSelect = document.getElementById('namaSiswa');
 
-    fetch('YOUR_APPS_SCRIPT_WEBAPP_URL', {
-        method: 'POST',
-        mode: 'no-cors',
-        body: JSON.stringify(formData)
-    }).then(() => {
-        alert('Data berhasil disimpan!');
-        setTanggalNow();
-        document.getElementById('kbmForm').reset();
-    }).catch(err => {
-        console.error(err);
-        alert('Gagal menyimpan data.');
+// Update nama siswa saat pilih kelas
+kelasSelect.addEventListener('change', ()=>{
+  const k = kelasSelect.value;
+  namaSiswaSelect.innerHTML = '<option value="">Pilih Siswa</option>';
+  if(siswaPerKelas[k]){
+    siswaPerKelas[k].forEach(s => {
+      namaSiswaSelect.innerHTML += `<option value="${s}">${s}</option>`;
     });
+  }
+});
+
+// Simpan data ke Google Spreadsheet via Apps Script
+document.getElementById('saveBtn').addEventListener('click', ()=>{
+  const formData = {
+    tanggal: document.getElementById('tanggal').value,
+    waliKelas: document.getElementById('waliKelas').value,
+    mapel: document.getElementById('mataPelajaran').value,
+    kelas: document.getElementById('kelas').value,
+    namaSiswa: document.getElementById('namaSiswa').value,
+    status: document.getElementById('status').value
+  };
+
+  if(!formData.tanggal || !formData.waliKelas || !formData.mapel || !formData.kelas || !formData.namaSiswa){
+    alert("Lengkapi semua field!");
+    return;
+  }
+
+  fetch('YOUR_WEB_APP_URL', { // ganti dengan URL Apps Script Web App
+    method: 'POST',
+    body: JSON.stringify(formData),
+    headers: { 'Content-Type': 'application/json' }
+  })
+  .then(res => res.json())
+  .then(res => {
+    if(res.result==="success") alert("Data berhasil disimpan!");
+    else alert("Gagal menyimpan data.");
+  })
+  .catch(err => { console.error(err); alert("Terjadi error saat menyimpan."); });
 });
 </script>
-
 </body>
 </html>
 
