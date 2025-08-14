@@ -96,16 +96,16 @@ const kelasSelect = document.getElementById('kelas');
 const mataPelajaranSelect = document.getElementById('mataPelajaran');
 const namaSiswaSelect = document.getElementById('namaSiswa');
 
-// --- Fetch Wali Kelas & Kelas ---
-fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vQXOP4L2k61miTcFTlb4r0QigIWRsMzVazznXCbNLqaHBpwY9RKgjnXdW4figjJZLmrrPcXbU6Q1f-E/pub?gid=1201461529&single=true&output=csv')
+// --- Fetch Wali Kelas & Kelas dari Spreadsheet gid=0 ---
+fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vQXOP4L2k61miTcFTlb4r0QigIWRsMzVazznXCbNLqaHBpwY9RKgjnXdW4figjJZLmrrPcXbU6Q1f-E/pub?gid=0&single=true&output=csv')
 .then(res => res.text())
 .then(csvText => {
-    const lines = csvText.split("\n").slice(1);
+    const lines = csvText.split("\n").slice(1); // mulai baris ke-2
     const kelasSet = new Set();
     lines.forEach(line=>{
         const cols = line.split(",");
-        const wali = cols[0]?.trim();
-        const kelas = cols[1]?.trim();
+        const wali = cols[0]?.trim(); // kolom A
+        const kelas = cols[1]?.trim(); // kolom B
         if(wali) waliKelasSelect.innerHTML += `<option value="${wali}">${wali}</option>`;
         if(kelas && !kelasSet.has(kelas)) {
           kelasSelect.innerHTML += `<option value="${kelas}">${kelas}</option>`;
@@ -114,7 +114,7 @@ fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vQXOP4L2k61miTcFTlb4r0Qig
     });
 });
 
-// --- Fetch Mata Pelajaran ---
+// --- Fetch Mata Pelajaran dari Spreadsheet gid=1451676013 ---
 fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vQXOP4L2k61miTcFTlb4r0QigIWRsMzVazznXCbNLqaHBpwY9RKgjnXdW4figjJZLmrrPcXbU6Q1f-E/pub?gid=1451676013&single=true&output=csv')
 .then(res => res.text())
 .then(csvText => {
