@@ -2,151 +2,130 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SIALAN – Rekap KBM</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+<title>Rekap Data</title>
 <style>
-body {
-    font-family: "Inter", sans-serif;
-    background-color: #f8f9fa;
-    color: #2c3e50;
-    margin: 0; padding: 0;
-}
-footer {
-    text-align: center;
-    padding: 20px 0;
-    font-size: 0.9rem;
-    color: #6c757d;
-    border-top: 1px solid #e9ecef;
-    background: linear-gradient(90deg,#ffffff,#f8f8f8);
-    box-shadow: 0 -2px 6px rgba(0,0,0,0.04);
-}
-.card {
-    border-radius: 15px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-    padding: 20px;
-}
-.table-hover tbody tr:hover {
-    background-color: #f1f3f5;
-}
+  body { font-family: Arial, sans-serif; margin: 20px; }
+  table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+  table, th, td { border: 1px solid #ccc; }
+  th, td { padding: 8px; text-align: left; }
+  th { background: #f2f2f2; }
+  .controls { margin-bottom: 10px; }
+  select, input, button { margin-right: 5px; }
 </style>
 </head>
 <body>
 
-<!-- Navbar Publik -->
-<div id="navbarContainer"></div>
+<h2>Rekap Data</h2>
 
-<!-- Rekap KBM -->
-<section class="container my-4">
-  <div class="card">
-    <h3 class="mb-3">Rekap Data KBM</h3>
+<div class="controls">
+  <label>Kelas: 
+    <select id="filterKelas"><option value="">Semua</option></select>
+  </label>
+  <label>Mapel: 
+    <select id="filterMapel"><option value="">Semua</option></select>
+  </label>
+  <label>Status: 
+    <select id="filterStatus">
+      <option value="">Semua</option>
+      <option value="Selesai">Selesai</option>
+      <option value="Belum">Belum</option>
+    </select>
+  </label>
+  <label>Nama: 
+    <input type="text" id="searchNama" placeholder="Cari nama...">
+  </label>
+  <button id="applyFilter">Terapkan</button>
+  <button id="resetFilter">Reset</button>
+  <label>Baris/Page: 
+    <select id="rowsPerPage">
+      <option value="15">15</option>
+      <option value="25">25</option>
+      <option value="50">50</option>
+      <option value="100">100</option>
+    </select>
+  </label>
+</div>
 
-    <!-- Filters -->
-    <div class="d-flex flex-wrap gap-2 mb-3 align-items-center">
-      <select id="filterKelas" class="form-select form-select-sm w-auto">
-        <option value="">Semua Kelas</option>
-      </select>
-      <select id="filterMapel" class="form-select form-select-sm w-auto">
-        <option value="">Semua Mata Pelajaran</option>
-      </select>
-      <select id="filterStatus" class="form-select form-select-sm w-auto">
-        <option value="">Semua Status</option>
-        <option value="Tuntas">Tuntas</option>
-        <option value="Ujian">Ujian</option>
-      </select>
-      <input type="text" id="searchNama" class="form-control form-control-sm w-auto" placeholder="Cari nama siswa">
-      <button class="btn btn-primary btn-sm" id="applyFilter">Terapkan</button>
-      <button class="btn btn-secondary btn-sm" id="resetFilter">Reset</button>
-      <label class="ms-2">Tampilkan:</label>
-      <select id="rowsPerPage" class="form-select form-select-sm w-auto">
-        <option value="15">15</option>
-        <option value="25">25</option>
-        <option value="50">50</option>
-        <option value="100">100</option>
-      </select>
-    </div>
+<table id="rekapTable">
+  <thead>
+    <tr>
+      <th>Tanggal</th>
+      <th>Kelas</th>
+      <th>Mata Pelajaran</th>
+      <th>Nama Siswa</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
 
-    <!-- Table -->
-    <div class="table-responsive">
-      <table class="table table-striped table-bordered table-hover rounded" id="rekapTable">
-        <thead>
-          <tr>
-            <th>Tanggal</th>
-            <th>Wali Kelas</th>
-            <th>Mata Pelajaran</th>
-            <th>Kelas</th>
-            <th>Nama Siswa</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
+<div class="controls">
+  <button id="prevPage">Prev</button>
+  <span id="pageInfo"></span>
+  <button id="nextPage">Next</button>
+</div>
 
-    <!-- Pagination -->
-    <div class="d-flex justify-content-between align-items-center mt-3">
-      <div>Halaman <span id="pageNum">1</span> dari <span id="totalPages">1</span></div>
-      <div class="d-flex gap-2">
-        <button class="btn btn-outline-secondary btn-sm" id="prevPage">Prev</button>
-        <button class="btn btn-outline-secondary btn-sm" id="nextPage">Next</button>
-      </div>
-    </div>
-  </div>
-</section>
-
-<footer>
-  © 2025 SIALAN – Sistem Analisis Laporan KBM Siswa
-</footer>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-// Load Navbar
-fetch('navbar_publik.html')
-  .then(res => res.text())
-  .then(html => document.getElementById('navbarContainer').innerHTML = html);
+let allData = [];
+let filteredData = [];
+let currentPage = 1;
+let rowsPerPage = 15;
 
-// Data & Pagination
-let allData = [], filteredData = [], currentPage = 1, rowsPerPage = 15;
-
-// Load CSV
+// Contoh fungsi load data CSV dari URL publik Google Sheets
 async function loadRekapData() {
-  const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQAEwBLEhaehGYlzYsNhBPfmozGvRZmpjyEOHC8rfgduB0JRurz-xwI_jfW8Fw8Vaz93a_E9tLyuIX9/pub?gid=0&single=true&output=csv";
+  const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vXXXXXXXXXX/pub?output=csv"; // ganti URL CSV-mu
   const res = await fetch(url);
-  const csvText = await res.text();
-  const lines = csvText.split("\n").filter(l => l.trim() !== "");
-  const headers = lines[0].split(",").map(h => h.trim().replace(/\s+/g, "_"));
-  return lines.slice(1).map(line => {
-    const vals = line.split(",");
-    const obj = {};
-    headers.forEach((h,i)=> obj[h] = (vals[i]||"").trim());
+  const text = await res.text();
+  const rows = text.split("\n").map(r => r.split(","));
+  const headers = rows[0];
+  return rows.slice(1).map(row => {
+    let obj = {};
+    headers.forEach((h, i) => {
+      obj[h.trim()] = row[i] ? row[i].trim() : "";
+    });
     return obj;
   });
 }
 
-// Render Table
+// Parse tanggal format DD/MM/YYYY
+function parseIndoDate(dateStr) {
+  const parts = dateStr.split("/");
+  if (parts.length === 3) {
+    return new Date(parts[2], parts[1] - 1, parts[0]);
+  }
+  return new Date(dateStr);
+}
+
+// Sortir data tanggal terbaru
+function sortByLatestDate(data) {
+  return data.sort((a, b) => parseIndoDate(b.Tanggal) - parseIndoDate(a.Tanggal));
+}
+
+// Render tabel sesuai halaman
 function renderTablePage(page) {
-  const tbody = document.querySelector('#rekapTable tbody');
-  tbody.innerHTML = '';
-  const start = (page-1)*rowsPerPage;
+  const start = (page - 1) * rowsPerPage;
   const end = start + rowsPerPage;
-  filteredData.slice(start,end).forEach(row => {
-    const tr = document.createElement('tr');
+  const pageData = filteredData.slice(start, end);
+
+  const tbody = document.querySelector("#rekapTable tbody");
+  tbody.innerHTML = "";
+  pageData.forEach(d => {
+    const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td>${row.Tanggal || ""}</td>
-      <td>${row.Wali_Kelas || ""}</td>
-      <td>${row.Mata_Pelajaran || ""}</td>
-      <td>${row.Kelas || ""}</td>
-      <td>${row.Nama_Siswa || ""}</td>
-      <td>${row.Status || ""}</td>
+      <td>${d.Tanggal || ""}</td>
+      <td>${d.Kelas || ""}</td>
+      <td>${d.Mata_Pelajaran || ""}</td>
+      <td>${d.Nama_Siswa || ""}</td>
+      <td>${d.Status || ""}</td>
     `;
     tbody.appendChild(tr);
   });
-  document.getElementById('pageNum').textContent = currentPage;
-  document.getElementById('totalPages').textContent = Math.ceil(filteredData.length / rowsPerPage);
+
+  document.getElementById("pageInfo").textContent =
+    `Halaman ${currentPage} dari ${Math.ceil(filteredData.length / rowsPerPage)}`;
 }
 
-// Apply Filters
+// Terapkan filter
 function applyFilters() {
   const kelas = document.getElementById('filterKelas').value;
   const mapel = document.getElementById('filterMapel').value;
@@ -154,58 +133,68 @@ function applyFilters() {
   const search = document.getElementById('searchNama').value.toLowerCase();
 
   filteredData = allData.filter(d =>
-    (!kelas || d.Kelas===kelas) &&
-    (!mapel || d.Mata_Pelajaran===mapel) &&
-    (!status || d.Status===status) &&
-    (!search || (d.Nama_Siswa||"").toLowerCase().includes(search))
+    (!kelas || d.Kelas === kelas) &&
+    (!mapel || d.Mata_Pelajaran === mapel) &&
+    (!status || d.Status === status) &&
+    (!search || (d.Nama_Siswa || "").toLowerCase().includes(search))
   );
 
+  filteredData = sortByLatestDate(filteredData);
   currentPage = 1;
   renderTablePage(currentPage);
 }
 
-// Populate Filters & Event Listeners
+// Inisialisasi
 async function init() {
   allData = await loadRekapData();
+  allData = sortByLatestDate(allData);
   filteredData = [...allData];
 
-  const kelasSet = new Set(allData.map(d=>d.Kelas).filter(Boolean));
-  const mapelSet = new Set(allData.map(d=>d.Mata_Pelajaran).filter(Boolean));
+  const kelasSet = new Set(allData.map(d => d.Kelas).filter(Boolean));
+  const mapelSet = new Set(allData.map(d => d.Mata_Pelajaran).filter(Boolean));
 
   const kelasSelect = document.getElementById('filterKelas');
-  kelasSet.forEach(k=>kelasSelect.innerHTML += `<option value="${k}">${k}</option>`);
+  kelasSet.forEach(k => kelasSelect.innerHTML += `<option value="${k}">${k}</option>`);
+
   const mapelSelect = document.getElementById('filterMapel');
-  mapelSet.forEach(m=>mapelSelect.innerHTML += `<option value="${m}">${m}</option>`);
+  mapelSet.forEach(m => mapelSelect.innerHTML += `<option value="${m}">${m}</option>`);
 
   renderTablePage(currentPage);
 
   document.getElementById('applyFilter').addEventListener('click', applyFilters);
-  document.getElementById('resetFilter').addEventListener('click', ()=>{
+  document.getElementById('resetFilter').addEventListener('click', () => {
     document.getElementById('filterKelas').value = '';
     document.getElementById('filterMapel').value = '';
     document.getElementById('filterStatus').value = '';
     document.getElementById('searchNama').value = '';
-    filteredData = [...allData];
+    filteredData = sortByLatestDate([...allData]);
     currentPage = 1;
     renderTablePage(currentPage);
   });
 
-  document.getElementById('rowsPerPage').addEventListener('change', e=>{
+  document.getElementById('rowsPerPage').addEventListener('change', e => {
     rowsPerPage = parseInt(e.target.value);
     currentPage = 1;
     renderTablePage(currentPage);
   });
 
-  document.getElementById('prevPage').addEventListener('click', ()=>{
-    if(currentPage>1){currentPage--; renderTablePage(currentPage);}
+  document.getElementById('prevPage').addEventListener('click', () => {
+    if (currentPage > 1) {
+      currentPage--;
+      renderTablePage(currentPage);
+    }
   });
-  document.getElementById('nextPage').addEventListener('click', ()=>{
-    if(currentPage<Math.ceil(filteredData.length/rowsPerPage)){currentPage++; renderTablePage(currentPage);}
+
+  document.getElementById('nextPage').addEventListener('click', () => {
+    if (currentPage < Math.ceil(filteredData.length / rowsPerPage)) {
+      currentPage++;
+      renderTablePage(currentPage);
+    }
   });
 }
 
 init();
 </script>
+
 </body>
 </html>
-
