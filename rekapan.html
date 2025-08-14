@@ -5,197 +5,207 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SIALAN – Rekap KBM</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="css/style.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+body {
+    font-family: "Inter", sans-serif;
+    background-color: #f8f9fa;
+    color: #2c3e50;
+    margin: 0; padding: 0;
+}
+footer {
+    text-align: center;
+    padding: 20px 0;
+    font-size: 0.9rem;
+    color: #6c757d;
+    border-top: 1px solid #e9ecef;
+    background: linear-gradient(90deg,#ffffff,#f8f8f8);
+    box-shadow: 0 -2px 6px rgba(0,0,0,0.04);
+}
+.card {
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    padding: 20px;
+}
+.table-hover tbody tr:hover {
+    background-color: #f1f3f5;
+}
+</style>
 </head>
 <body>
 
-<!-- Load Navbar Publik -->
+<!-- Navbar Publik -->
 <div id="navbarContainer"></div>
 
+<!-- Rekap KBM -->
 <section class="container my-4">
-<h3 class="mb-4">Rekap Data KBM</h3>
+  <div class="card">
+    <h3 class="mb-3">Rekap Data KBM</h3>
 
-  <div class="row mb-3">
-    <div class="col-md-3">
-      <select id="filterKelas" class="form-select">
+    <!-- Filters -->
+    <div class="d-flex flex-wrap gap-2 mb-3 align-items-center">
+      <select id="filterKelas" class="form-select form-select-sm w-auto">
         <option value="">Semua Kelas</option>
       </select>
-    </div>
-    <div class="col-md-3">
-      <select id="filterMapel" class="form-select">
+      <select id="filterMapel" class="form-select form-select-sm w-auto">
         <option value="">Semua Mata Pelajaran</option>
       </select>
-    </div>
-    <div class="col-md-3">
-      <select id="filterStatus" class="form-select">
+      <select id="filterStatus" class="form-select form-select-sm w-auto">
         <option value="">Semua Status</option>
         <option value="Tuntas">Tuntas</option>
         <option value="Ujian">Ujian</option>
       </select>
+      <input type="text" id="searchNama" class="form-control form-control-sm w-auto" placeholder="Cari nama siswa">
+      <button class="btn btn-primary btn-sm" id="applyFilter">Terapkan</button>
+      <button class="btn btn-secondary btn-sm" id="resetFilter">Reset</button>
+      <label class="ms-2">Tampilkan:</label>
+      <select id="rowsPerPage" class="form-select form-select-sm w-auto">
+        <option value="15">15</option>
+        <option value="25">25</option>
+        <option value="50">50</option>
+        <option value="100">100</option>
+      </select>
     </div>
-    <div class="col-md-3">
-      <input type="text" id="searchNama" class="form-control" placeholder="Cari nama siswa">
+
+    <!-- Table -->
+    <div class="table-responsive">
+      <table class="table table-striped table-bordered table-hover rounded" id="rekapTable">
+        <thead>
+          <tr>
+            <th>Tanggal</th>
+            <th>Wali Kelas</th>
+            <th>Mata Pelajaran</th>
+            <th>Kelas</th>
+            <th>Nama Siswa</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
     </div>
-  </div>
 
-  <div class="mb-3 d-flex align-items-center">
-    <button class="btn btn-primary me-2" id="applyFilter">Terapkan Filter</button>
-    <button class="btn btn-secondary me-3" id="resetFilter">Reset Filter</button>
-
-    <label class="me-2">Tampilkan:</label>
-    <select id="rowsPerPage" class="form-select w-auto">
-      <option value="15">15</option>
-      <option value="25">25</option>
-      <option value="50">50</option>
-      <option value="100">100</option>
-    </select>
-  </div>
-
-  <div class="table-responsive">
-    <table class="table table-striped table-bordered" id="rekapTable">
-      <thead>
-        <tr>
-          <th>Tanggal</th>
-          <th>Wali Kelas</th>
-          <th>Mata Pelajaran</th>
-          <th>Kelas</th>
-          <th>Nama Siswa</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
-
-  <!-- Pagination -->
-  <div class="d-flex justify-content-between align-items-center mt-3">
-    <div>Halaman <span id="pageNum">1</span> dari <span id="totalPages">1</span></div>
-    <div>
-      <button class="btn btn-outline-secondary btn-sm me-2" id="prevPage">Prev</button>
-      <button class="btn btn-outline-secondary btn-sm" id="nextPage">Next</button>
+    <!-- Pagination -->
+    <div class="d-flex justify-content-between align-items-center mt-3">
+      <div>Halaman <span id="pageNum">1</span> dari <span id="totalPages">1</span></div>
+      <div class="d-flex gap-2">
+        <button class="btn btn-outline-secondary btn-sm" id="prevPage">Prev</button>
+        <button class="btn btn-outline-secondary btn-sm" id="nextPage">Next</button>
+      </div>
     </div>
   </div>
 </section>
 
-<footer class="text-center py-3">
+<footer>
   © 2025 SIALAN – Sistem Analisis Laporan KBM Siswa
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-  fetch('navbar_publik.html')
-    .then(res => res.text())
-    .then(html => document.getElementById('navbarContainer').innerHTML = html);
+// Load Navbar
+fetch('navbar_publik.html')
+  .then(res => res.text())
+  .then(html => document.getElementById('navbarContainer').innerHTML = html);
 
-  let allData = [];
-  let filteredData = [];
-  let currentPage = 1;
-  let rowsPerPage = 15;
+// Data & Pagination
+let allData = [], filteredData = [], currentPage = 1, rowsPerPage = 15;
 
-  async function loadRekapData() {
-    const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQAEwBLEhaehGYlzYsNhBPfmozGvRZmpjyEOHC8rfgduB0JRurz-xwI_jfW8Fw8Vaz93a_E9tLyuIX9/pub?gid=0&single=true&output=csv";
-    const res = await fetch(url);
-    const csvText = await res.text();
-    const lines = csvText.split("\n").filter(l => l.trim() !== "");
-    const headers = lines[0].split(",").map(h => h.trim().replace(/\s+/g, "_"));
+// Load CSV
+async function loadRekapData() {
+  const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQAEwBLEhaehGYlzYsNhBPfmozGvRZmpjyEOHC8rfgduB0JRurz-xwI_jfW8Fw8Vaz93a_E9tLyuIX9/pub?gid=0&single=true&output=csv";
+  const res = await fetch(url);
+  const csvText = await res.text();
+  const lines = csvText.split("\n").filter(l => l.trim() !== "");
+  const headers = lines[0].split(",").map(h => h.trim().replace(/\s+/g, "_"));
+  return lines.slice(1).map(line => {
+    const vals = line.split(",");
+    const obj = {};
+    headers.forEach((h,i)=> obj[h] = (vals[i]||"").trim());
+    return obj;
+  });
+}
 
-    return lines.slice(1).map(line => {
-      const vals = line.split(",");
-      const obj = {};
-      headers.forEach((h, i) => obj[h] = (vals[i] || "").trim());
-      return obj;
-    });
-  }
+// Render Table
+function renderTablePage(page) {
+  const tbody = document.querySelector('#rekapTable tbody');
+  tbody.innerHTML = '';
+  const start = (page-1)*rowsPerPage;
+  const end = start + rowsPerPage;
+  filteredData.slice(start,end).forEach(row => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${row.Tanggal || ""}</td>
+      <td>${row.Wali_Kelas || ""}</td>
+      <td>${row.Mata_Pelajaran || ""}</td>
+      <td>${row.Kelas || ""}</td>
+      <td>${row.Nama_Siswa || ""}</td>
+      <td>${row.Status || ""}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+  document.getElementById('pageNum').textContent = currentPage;
+  document.getElementById('totalPages').textContent = Math.ceil(filteredData.length / rowsPerPage);
+}
 
-  function renderTablePage(page) {
-    const tbody = document.querySelector('#rekapTable tbody');
-    tbody.innerHTML = '';
-    const start = (page - 1) * rowsPerPage;
-    const end = start + rowsPerPage;
-    const pageData = filteredData.slice(start, end);
+// Apply Filters
+function applyFilters() {
+  const kelas = document.getElementById('filterKelas').value;
+  const mapel = document.getElementById('filterMapel').value;
+  const status = document.getElementById('filterStatus').value;
+  const search = document.getElementById('searchNama').value.toLowerCase();
 
-    pageData.forEach(row => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${row.Tanggal || ""}</td>
-        <td>${row.Wali_Kelas || ""}</td>
-        <td>${row.Mata_Pelajaran || ""}</td>
-        <td>${row.Kelas || ""}</td>
-        <td>${row.Nama_Siswa || ""}</td>
-        <td>${row.Status || ""}</td>
-      `;
-      tbody.appendChild(tr);
-    });
+  filteredData = allData.filter(d =>
+    (!kelas || d.Kelas===kelas) &&
+    (!mapel || d.Mata_Pelajaran===mapel) &&
+    (!status || d.Status===status) &&
+    (!search || (d.Nama_Siswa||"").toLowerCase().includes(search))
+  );
 
-    document.getElementById('pageNum').textContent = currentPage;
-    document.getElementById('totalPages').textContent = Math.ceil(filteredData.length / rowsPerPage);
-  }
+  currentPage = 1;
+  renderTablePage(currentPage);
+}
 
-  function applyFilters() {
-    const kelas = document.getElementById('filterKelas').value;
-    const mapel = document.getElementById('filterMapel').value;
-    const status = document.getElementById('filterStatus').value;
-    const search = document.getElementById('searchNama').value.toLowerCase();
+// Populate Filters & Event Listeners
+async function init() {
+  allData = await loadRekapData();
+  filteredData = [...allData];
 
-    filteredData = allData.filter(d =>
-      (!kelas || d.Kelas === kelas) &&
-      (!mapel || d.Mata_Pelajaran === mapel) &&
-      (!status || d.Status === status) &&
-      (!search || (d.Nama_Siswa || "").toLowerCase().includes(search))
-    );
+  const kelasSet = new Set(allData.map(d=>d.Kelas).filter(Boolean));
+  const mapelSet = new Set(allData.map(d=>d.Mata_Pelajaran).filter(Boolean));
 
+  const kelasSelect = document.getElementById('filterKelas');
+  kelasSet.forEach(k=>kelasSelect.innerHTML += `<option value="${k}">${k}</option>`);
+  const mapelSelect = document.getElementById('filterMapel');
+  mapelSet.forEach(m=>mapelSelect.innerHTML += `<option value="${m}">${m}</option>`);
+
+  renderTablePage(currentPage);
+
+  document.getElementById('applyFilter').addEventListener('click', applyFilters);
+  document.getElementById('resetFilter').addEventListener('click', ()=>{
+    document.getElementById('filterKelas').value = '';
+    document.getElementById('filterMapel').value = '';
+    document.getElementById('filterStatus').value = '';
+    document.getElementById('searchNama').value = '';
+    filteredData = [...allData];
     currentPage = 1;
     renderTablePage(currentPage);
-  }
+  });
 
-  async function populateFilters() {
-    allData = await loadRekapData();
-    filteredData = [...allData];
-
-    const kelasSet = new Set(allData.map(d => d.Kelas).filter(Boolean));
-    const mapelSet = new Set(allData.map(d => d.Mata_Pelajaran).filter(Boolean));
-
-    const kelasSelect = document.getElementById('filterKelas');
-    kelasSet.forEach(k => kelasSelect.innerHTML += `<option value="${k}">${k}</option>`);
-
-    const mapelSelect = document.getElementById('filterMapel');
-    mapelSet.forEach(m => mapelSelect.innerHTML += `<option value="${m}">${m}</option>`);
-
+  document.getElementById('rowsPerPage').addEventListener('change', e=>{
+    rowsPerPage = parseInt(e.target.value);
+    currentPage = 1;
     renderTablePage(currentPage);
+  });
 
-    document.getElementById('applyFilter').addEventListener('click', applyFilters);
-    document.getElementById('resetFilter').addEventListener('click', () => {
-      document.getElementById('filterKelas').value = '';
-      document.getElementById('filterMapel').value = '';
-      document.getElementById('filterStatus').value = '';
-      document.getElementById('searchNama').value = '';
-      filteredData = [...allData];
-      currentPage = 1;
-      renderTablePage(currentPage);
-    });
+  document.getElementById('prevPage').addEventListener('click', ()=>{
+    if(currentPage>1){currentPage--; renderTablePage(currentPage);}
+  });
+  document.getElementById('nextPage').addEventListener('click', ()=>{
+    if(currentPage<Math.ceil(filteredData.length/rowsPerPage)){currentPage++; renderTablePage(currentPage);}
+  });
+}
 
-    document.getElementById('rowsPerPage').addEventListener('change', (e) => {
-      rowsPerPage = parseInt(e.target.value);
-      currentPage = 1;
-      renderTablePage(currentPage);
-    });
-
-    document.getElementById('prevPage').addEventListener('click', () => {
-      if (currentPage > 1) {
-        currentPage--;
-        renderTablePage(currentPage);
-      }
-    });
-
-    document.getElementById('nextPage').addEventListener('click', () => {
-      if (currentPage < Math.ceil(filteredData.length / rowsPerPage)) {
-        currentPage++;
-        renderTablePage(currentPage);
-      }
-    });
-  }
-
-  populateFilters();
+init();
 </script>
 </body>
 </html>
+
