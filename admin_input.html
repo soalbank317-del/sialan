@@ -3,98 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Input KBM</title>
+    <title>Input Data KBM</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body { background: #f8f9fa; }
-        .container { max-width: 900px; margin-top: 20px; }
-        table { background: white; }
-        th, td { vertical-align: middle; }
-    </style>
 </head>
 <body>
 
-<div class="container">
-    <h2 class="mb-4">Form Input KBM</h2>
+<!-- Navbar -->
+<div id="navbar"></div>
+<script>
+    fetch("navbar_admin.html")
+        .then(response => response.text())
+        .then(data => document.getElementById("navbar").innerHTML = data);
+</script>
 
-    <!-- Info Wali Kelas -->
-    <div class="mb-3 p-3 bg-light rounded border">
-        <strong>Nama Wali Kelas:</strong> <span id="userName">Admin</span> <br>
-        <strong>Kelas:</strong> <span id="userKelas">7A</span>
+<div class="container mt-4">
+    <h3 class="mb-4">Form Input Data KBM</h3>
+
+    <!-- Info Wali Kelas & Kelas -->
+    <div class="mb-3">
+        <div>Nama Wali Kelas: <span id="userName">Admin</span></div>
+        <div>Kelas: <span id="userKelas">7A</span></div>
     </div>
 
-    <!-- Form Input -->
-    <form id="kbmForm" class="mb-4">
+    <!-- Form -->
+    <form id="kbmForm" class="card p-3 shadow-sm">
         <div class="mb-3">
-            <label for="tanggal" class="form-label">Tanggal & Waktu</label>
-            <input type="datetime-local" id="tanggal" class="form-control" required>
+            <label for="tanggal" class="form-label">Tanggal</label>
+            <input type="text" class="form-control" id="tanggal" name="tanggal" readonly>
         </div>
+
+        <div class="mb-3">
+            <label for="waliKelas" class="form-label">Wali Kelas</label>
+            <input type="text" class="form-control" id="waliKelas" name="waliKelas" value="Admin" readonly>
+        </div>
+
         <div class="mb-3">
             <label for="mapel" class="form-label">Mata Pelajaran</label>
-            <input type="text" id="mapel" class="form-control" placeholder="Masukkan mata pelajaran" required>
-        </div>
-        <div class="mb-3">
-            <label for="namaSiswa" class="form-label">Nama Siswa</label>
-            <input type="text" id="namaSiswa" class="form-control" placeholder="Masukkan nama siswa" required>
-        </div>
-        <div class="mb-3">
-            <label for="status" class="form-label">Status</label>
-            <select id="status" class="form-select" required>
-                <option value="">Pilih status</option>
-                <option value="Selesai">Selesai</option>
-                <option value="Belum">Belum</option>
+            <select class="form-select" id="mapel" name="mapel" required>
+                <option value="">Pilih Mata Pelajaran</option>
+                <option>Matematika</option>
+                <option>IPA</option>
+                <option>IPS</option>
+                <option>Bahasa Indonesia</option>
+                <option>Bahasa Inggris</option>
             </select>
         </div>
+
+        <div class="mb-3">
+            <label for="kelas" class="form-label">Kelas</label>
+            <input type="text" class="form-control" id="kelas" name="kelas" value="7A" readonly>
+        </div>
+
+        <div class="mb-3">
+            <label for="namaSiswa" class="form-label">Nama Siswa</label>
+            <select class="form-select" id="namaSiswa" name="namaSiswa" required>
+                <option value="">Pilih Nama Siswa</option>
+                <option>Andi</option>
+                <option>Budi</option>
+                <option>Citra</option>
+                <option>Dewi</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="status" class="form-label">Status</label>
+            <select class="form-select" id="status" name="status" required>
+                <option value="">Pilih Status</option>
+                <option>Selesai</option>
+                <option>Belum</option>
+            </select>
+        </div>
+
         <button type="submit" class="btn btn-primary">Simpan</button>
     </form>
-
-    <!-- Tabel Rekap -->
-    <h4>Data KBM</h4>
-    <table class="table table-bordered table-striped">
-        <thead class="table-dark">
-            <tr>
-                <th>Tanggal & Waktu</th>
-                <th>Mata Pelajaran</th>
-                <th>Nama Siswa</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody id="dataTable">
-            <!-- Data siswa muncul di sini -->
-        </tbody>
-    </table>
 </div>
 
 <script>
-    const form = document.getElementById('kbmForm');
-    const dataTable = document.getElementById('dataTable');
+    // Set tanggal otomatis format dd/mm/yyyy hh:mm:ss
+    function setTanggalNow() {
+        let now = new Date();
+        let day = String(now.getDate()).padStart(2, '0');
+        let month = String(now.getMonth() + 1).padStart(2, '0');
+        let year = now.getFullYear();
+        let hours = String(now.getHours()).padStart(2, '0');
+        let minutes = String(now.getMinutes()).padStart(2, '0');
+        let seconds = String(now.getSeconds()).padStart(2, '0');
+        document.getElementById('tanggal').value = `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+    }
+    setTanggalNow();
 
-    form.addEventListener('submit', function(e) {
+    // Kirim data ke Google Apps Script
+    document.getElementById('kbmForm').addEventListener('submit', function(e) {
         e.preventDefault();
 
-        // Ambil nilai input
-        let tanggalInput = document.getElementById('tanggal').value;
-        let mapel = document.getElementById('mapel').value;
-        let namaSiswa = document.getElementById('namaSiswa').value;
-        let status = document.getElementById('status').value;
+        let formData = {
+            tanggal: document.getElementById('tanggal').value,
+            waliKelas: document.getElementById('waliKelas').value,
+            mapel: document.getElementById('mapel').value,
+            kelas: document.getElementById('kelas').value,
+            namaSiswa: document.getElementById('namaSiswa').value,
+            status: document.getElementById('status').value
+        };
 
-        // Format tanggal ke dd/mm/yyyy hh:mm:ss
-        let tanggalObj = new Date(tanggalInput);
-        let formattedTanggal = tanggalObj.toLocaleDateString('id-ID') + " " +
-                               tanggalObj.toLocaleTimeString('id-ID');
-
-        // Tambahkan ke tabel
-        let row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${formattedTanggal}</td>
-            <td>${mapel}</td>
-            <td>${namaSiswa}</td>
-            <td>${status}</td>
-        `;
-        dataTable.appendChild(row);
-
-        // Reset form
-        form.reset();
+        fetch('YOUR_APPS_SCRIPT_WEBAPP_URL', {
+            method: 'POST',
+            mode: 'no-cors',
+            body: JSON.stringify(formData)
+        }).then(() => {
+            alert('Data berhasil disimpan!');
+            setTanggalNow(); // reset tanggal
+            document.getElementById('kbmForm').reset();
+        }).catch(err => {
+            console.error(err);
+            alert('Gagal menyimpan data.');
+        });
     });
 </script>
 
