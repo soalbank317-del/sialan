@@ -19,62 +19,63 @@
 <div class="container mt-4">
     <h3 class="mb-4">Form Input Data KBM</h3>
 
-    <!-- Info Wali Kelas & Kelas -->
-    <div class="mb-3">
-        <div>Nama Wali Kelas: <span id="userName">Admin</span></div>
-        <div>Kelas: <span id="userKelas">7A</span></div>
-    </div>
-
-    <!-- Form -->
     <form id="kbmForm" class="card p-3 shadow-sm">
-        <div class="mb-3">
-            <label for="tanggal" class="form-label">Tanggal</label>
-            <input type="text" class="form-control" id="tanggal" name="tanggal" readonly>
-        </div>
-
-        <div class="mb-3">
-            <label for="waliKelas" class="form-label">Wali Kelas</label>
-            <input type="text" class="form-control" id="waliKelas" name="waliKelas" value="Admin" readonly>
-        </div>
-
-        <div class="mb-3">
-            <label for="mapel" class="form-label">Mata Pelajaran</label>
-            <select class="form-select" id="mapel" name="mapel" required>
-                <option value="">Pilih Mata Pelajaran</option>
-                <option>Matematika</option>
-                <option>IPA</option>
-                <option>IPS</option>
-                <option>Bahasa Indonesia</option>
-                <option>Bahasa Inggris</option>
-            </select>
-        </div>
-
-        <div class="mb-3">
-            <label for="kelas" class="form-label">Kelas</label>
-            <input type="text" class="form-control" id="kelas" name="kelas" value="7A" readonly>
-        </div>
-
-        <div class="mb-3">
-            <label for="namaSiswa" class="form-label">Nama Siswa</label>
-            <select class="form-select" id="namaSiswa" name="namaSiswa" required>
-                <option value="">Pilih Nama Siswa</option>
-                <option>Andi</option>
-                <option>Budi</option>
-                <option>Citra</option>
-                <option>Dewi</option>
-            </select>
-        </div>
-
-        <div class="mb-3">
-            <label for="status" class="form-label">Status</label>
-            <select class="form-select" id="status" name="status" required>
-                <option value="">Pilih Status</option>
-                <option>Selesai</option>
-                <option>Belum</option>
-            </select>
-        </div>
-
-        <button type="submit" class="btn btn-primary">Simpan</button>
+        <table class="table table-bordered align-middle">
+            <tbody>
+                <tr>
+                    <th style="width: 25%;">Tanggal</th>
+                    <td><input type="text" class="form-control" id="tanggal" name="tanggal" readonly></td>
+                </tr>
+                <tr>
+                    <th>Nama Wali Kelas</th>
+                    <td><input type="text" class="form-control" id="waliKelas" name="waliKelas" value="Admin" readonly></td>
+                </tr>
+                <tr>
+                    <th>Kelas</th>
+                    <td><input type="text" class="form-control" id="kelas" name="kelas" value="7A" readonly></td>
+                </tr>
+                <tr>
+                    <th>Mata Pelajaran</th>
+                    <td>
+                        <select class="form-select" id="mapel" name="mapel" required>
+                            <option value="">Pilih Mata Pelajaran</option>
+                            <option>Matematika</option>
+                            <option>IPA</option>
+                            <option>IPS</option>
+                            <option>Bahasa Indonesia</option>
+                            <option>Bahasa Inggris</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Nama Siswa</th>
+                    <td>
+                        <select class="form-select" id="namaSiswa" name="namaSiswa" required>
+                            <option value="">Pilih Nama Siswa</option>
+                            <option>Andi</option>
+                            <option>Budi</option>
+                            <option>Citra</option>
+                            <option>Dewi</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Status</th>
+                    <td>
+                        <select class="form-select" id="status" name="status" required>
+                            <option value="">Pilih Status</option>
+                            <option>Selesai</option>
+                            <option>Belum</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" class="text-center">
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </form>
 </div>
 
@@ -111,7 +112,7 @@
             body: JSON.stringify(formData)
         }).then(() => {
             alert('Data berhasil disimpan!');
-            setTanggalNow(); // reset tanggal
+            setTanggalNow();
             document.getElementById('kbmForm').reset();
         }).catch(err => {
             console.error(err);
