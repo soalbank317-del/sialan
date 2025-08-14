@@ -150,30 +150,35 @@ footer {
 // --- Login Admin ---
 const loginLink = document.getElementById('loginLink');
 loginLink.addEventListener('click', function(e) {
-  e.preventDefault(); // penting agar tidak langsung buka halaman
+  e.preventDefault();
   const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
   loginModal.show();
 });
 
-// Ganti ini dengan link CSV publikmu yang benar
-const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQXOP4L2k61miTcFTlb4r0QigIWRsMzVazznXCbNLqaHBpwY9RKgjnXdW4figjJZLmrrPcXbU6Q1f-E/pub?gid=1201461529&single=true&output=csv';
+// CSV Google Sheets untuk login
+const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQXOP4L2k61miTcFTlb4r0QigIWRsMzVazznXCbNLqaHBpwY9RKgjnXdW4figjJZLmrrPcXbU6Q1f-E/pub?gid=1840020379&single=true&output=csv';
+
 let userData = [];
 
 Papa.parse(csvUrl, {
   download: true,
-  header: true,
+  header: false,
   complete: function(results) {
-    userData = results.data;
-    console.log("Data pengguna:", userData); // debug
+    // mulai dari baris kedua
+    userData = results.data.slice(1).filter(row => row[0] && row[1]);
   }
 });
 
 document.getElementById('loginForm').addEventListener('submit', function(e) {
   e.preventDefault();
-  const usernameInput = document.getElementById('username').value.trim();
+  const usernameInput = document.getElementById('username').value.trim().toLowerCase();
   const passwordInput = document.getElementById('password').value.trim();
-  const validUser = userData.find(user => user['Username'] === usernameInput && user['Password'] === passwordInput);
-  console.log("Login dicoba:", usernameInput, passwordInput, validUser); // debug
+
+  const validUser = userData.find(user => 
+    user[0].trim().toLowerCase() === usernameInput &&
+    user[1].trim() === passwordInput
+  );
+
   if(validUser) {
     sessionStorage.setItem('user', usernameInput);
     window.location.href = 'admin_input.html';
@@ -287,3 +292,4 @@ init();
 </script>
 </body>
 </html>
+
