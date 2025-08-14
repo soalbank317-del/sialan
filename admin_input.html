@@ -14,6 +14,9 @@ body { font-family: "Inter", sans-serif; background-color: #f8f9fa; color: #2c3e
 </head>
 <body>
 
+<!-- Notifikasi -->
+<div id="notifContainer" class="container mt-2"></div>
+
 <div id="navbarContainer"></div>
 
 <section class="container my-4">
@@ -46,7 +49,7 @@ body { font-family: "Inter", sans-serif; background-color: #f8f9fa; color: #2c3e
       </table>
     </div>
 
-    <!-- Tabel siswa akan muncul di sini -->
+    <!-- Tabel siswa -->
     <div class="table-responsive mt-3">
       <table class="table table-bordered table-hover" id="siswaTable">
         <thead>
@@ -55,12 +58,14 @@ body { font-family: "Inter", sans-serif; background-color: #f8f9fa; color: #2c3e
             <th>Status</th>
           </tr>
         </thead>
-        <tbody id="siswaTableBody">
-        </tbody>
+        <tbody id="siswaTableBody"></tbody>
       </table>
+      <div class="mb-2">
+        <button class="btn btn-secondary btn-sm" onclick="setStatusSemua('Tuntas')">Tuntas Semua</button>
+        <button class="btn btn-secondary btn-sm" onclick="setStatusSemua('Ujian')">Ujian Semua</button>
+      </div>
     </div>
 
-    <!-- Tombol Simpan Data -->
     <div class="mt-2">
       <button class="btn btn-primary" id="saveTableBtn" disabled>Simpan Data</button>
     </div>
@@ -78,44 +83,54 @@ fetch('navbar_admin.html')
 .then(res => res.text())
 .then(html => document.getElementById('navbarContainer').innerHTML = html);
 
-// Elemen
+const notifContainer = document.getElementById('notifContainer');
 const waliKelasSelect = document.getElementById('waliKelas');
 const kelasSelect = document.getElementById('kelas');
 const mataPelajaranSelect = document.getElementById('mataPelajaran');
 const siswaTableBody = document.getElementById('siswaTableBody');
 const saveTableBtn = document.getElementById('saveTableBtn');
 
+// --- Fungsi notifikasi ---
+function showNotif(message, type='success'){
+  notifContainer.innerHTML = `
+    <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+      ${message}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+  `;
+}
+
 // --- Fetch Wali Kelas & Kelas ---
 fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vQXOP4L2k61miTcFTlb4r0QigIWRsMzVazznXCbNLqaHBpwY9RKgjnXdW4figjJZLmrrPcXbU6Q1f-E/pub?gid=0&single=true&output=csv')
 .then(res => res.text())
 .then(csvText => {
-    const lines = csvText.split("\n").slice(1);
-    const kelasSet = new Set();
-    lines.forEach(line=>{
-        const cols = line.split(",");
-        const wali = cols[0]?.trim();
-        const kelas = cols[1]?.trim();
-        if(wali) waliKelasSelect.innerHTML += `<option value="${wali}">${wali}</option>`;
-        if(kelas && !kelasSet.has(kelas)) {
-          kelasSelect.innerHTML += `<option value="${kelas}">${kelas}</option>`;
-          kelasSet.add(kelas);
-        }
-    });
+  const lines = csvText.split("\n").slice(1);
+  const kelasSet = new Set();
+  lines.forEach(line=>{
+    const cols = line.split(",");
+    const wali = cols[0]?.trim();
+    const kelas = cols[1]?.trim();
+    if(wali) waliKelasSelect.innerHTML += `<option value="${wali}">${wali}</option>`;
+    if(kelas && !kelasSet.has(kelas)) {
+      kelasSelect.innerHTML += `<option value="${kelas}">${kelas}</option>`;
+      kelasSet.add(kelas);
+    }
+  });
 });
 
 // --- Fetch Mata Pelajaran ---
 fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vQXOP4L2k61miTcFTlb4r0QigIWRsMzVazznXCbNLqaHBpwY9RKgjnXdW4figjJZLmrrPcXbU6Q1f-E/pub?gid=1451676013&single=true&output=csv')
 .then(res => res.text())
 .then(csvText => {
-    const lines = csvText.split("\n").slice(1);
-    lines.forEach(line=>{
-        const cols = line.split(",");
-        const mapel = cols[0]?.trim();
-        if(mapel) mataPelajaranSelect.innerHTML += `<option value="${mapel}">${mapel}</option>`;
-    });
+  const lines = csvText.split("\n").slice(1);
+  lines.forEach(line=>{
+    const cols = line.split(",");
+    const mapel = cols[0]?.trim();
+    if(mapel) mataPelajaranSelect.innerHTML += `<option value="${mapel}">${mapel}</option>`;
+  });
 });
 
-// --- Fetch Nama Siswa per Kelas dari Spreadsheet ---
+// --- Fetch Nama Siswa per Kelas ---
 async function fetchSiswaPerKelas(kelasTerpilih){
   const url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQXOP4L2k61miTcFTlb4r0QigIWRsMzVazznXCbNLqaHBpwY9RKgjnXdW4figjJZLmrrPcXbU6Q1f-E/pub?gid=852230839&single=true&output=csv';
   const res = await fetch(url);
@@ -136,7 +151,6 @@ kelasSelect.addEventListener('change', async ()=>{
   const k = kelasSelect.value;
   siswaTableBody.innerHTML = '';
   if(!k) return;
-
   const siswaList = await fetchSiswaPerKelas(k);
   siswaList.forEach(s=>{
     const tr = document.createElement('tr');
@@ -154,7 +168,7 @@ kelasSelect.addEventListener('change', async ()=>{
   cekDataLengkap();
 });
 
-// --- Tombol Semua Tuntas / Semua Ujian (opsional) ---
+// --- Tombol Semua Tuntas / Semua Ujian ---
 function setStatusSemua(value){
   siswaTableBody.querySelectorAll('select').forEach(sel=>sel.value = value);
   cekDataLengkap();
@@ -185,22 +199,34 @@ saveTableBtn.addEventListener('click', ()=>{
     kelas: kelasSelect.value,
     siswa: []
   };
-
   siswaTableBody.querySelectorAll('select').forEach(sel=>{
     formData.siswa.push({nama: sel.dataset.siswa, status: sel.value});
   });
 
-  fetch('YOUR_WEB_APP_URL', { // ganti dengan URL Apps Script Web App
+  fetch('https://script.google.com/macros/s/AKfycbxtv-QilDJHlHYU0oHKnLc8eJymm9wufTpcsej1iXDZXo9hndOwUTUqmCPz0fG0Xbpr/exec', {
     method: 'POST',
     body: JSON.stringify(formData),
     headers: { 'Content-Type': 'application/json' }
   })
   .then(res => res.json())
   .then(res => {
-    if(res.result === "success") alert("Data berhasil disimpan!");
-    else alert("Gagal menyimpan data.");
+    if(res.result === "success") {
+      showNotif("Data berhasil disimpan!", "success");
+      // Reset semua form
+      document.getElementById('tanggal').value = '';
+      waliKelasSelect.value = '';
+      mataPelajaranSelect.value = '';
+      kelasSelect.value = '';
+      siswaTableBody.innerHTML = '';
+      saveTableBtn.disabled = true;
+    } else {
+      showNotif("Gagal menyimpan data: " + res.message, "danger");
+    }
   })
-  .catch(err => { console.error(err); alert("Terjadi error saat menyimpan."); });
+  .catch(err => {
+    console.error(err);
+    showNotif("Terjadi error saat menyimpan.", "danger");
+  });
 });
 </script>
 </body>
