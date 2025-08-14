@@ -54,7 +54,7 @@ async function fetchSheetData() {
   });
 }
 
-// Render Chart dengan angka di atas batang
+// Render Chart Tuntas & Ujian berdampingan
 fetchSheetData().then(data=>{
   const mapelLabels = [...new Set(data.map(d=>d.Mata_Pelajaran))];
   const tuntasData = mapelLabels.map(mp => data.filter(d=>d.Mata_Pelajaran===mp && d.Status==="Tuntas").length);
@@ -66,8 +66,8 @@ fetchSheetData().then(data=>{
     data:{
       labels: mapelLabels,
       datasets:[
-        {label:'Tuntas', data:tuntasData, backgroundColor:'#198754', borderRadius:8, borderSkipped:false},
-        {label:'Ujian',  data:ujianData,  backgroundColor:'#dc3545', borderRadius:8, borderSkipped:false}
+        {label:'Tuntas', data:tuntasData, backgroundColor:'#198754', borderRadius:8},
+        {label:'Ujian',  data:ujianData,  backgroundColor:'#dc3545', borderRadius:8}
       ]
     },
     options:{
@@ -96,8 +96,8 @@ fetchSheetData().then(data=>{
       },
       interaction:{mode:'nearest', axis:'x', intersect:false},
       scales:{
-        x:{stacked:true, grid:{display:false}},
-        y:{stacked:true, beginAtZero:true, ticks:{stepSize:1}}
+        x:{stacked:false, grid:{display:false}}, // stacked:false → batang berdampingan
+        y:{stacked:false, beginAtZero:true, ticks:{stepSize:1}}
       }
     },
     plugins:[ChartDataLabels]
