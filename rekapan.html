@@ -13,6 +13,14 @@
 <div id="navbarContainer"></div>
 
 <section class="container my-4">
+  <div class="d-flex align-items-center mb-4">
+    <img src="https://drive.google.com/uc?id=1SMsQrY1Q9L-NRMcmJIk7y1msb5YFcOzM" alt="Profil" class="profile-img me-3">
+    <div>
+      <div>Nama Wali Kelas: <span id="userName">Admin</span></div>
+      <div>Kelas: <span id="userKelas">7A</span></div>
+    </div>
+  </div>
+  
   <h3 class="mb-4">Rekap Data KBM</h3>
 
   <div class="row mb-3">
@@ -60,7 +68,7 @@
   </div>
 </section>
 
-<footer>
+<footer class="text-center py-3">
   © 2025 SIALAN – Sistem Analisis Laporan KBM Siswa
 </footer>
 
@@ -77,11 +85,14 @@
     const res = await fetch(url);
     const csvText = await res.text();
     const lines = csvText.split("\n").filter(l => l.trim() !== "");
-    const headers = lines[0].split(",");
+
+    // Normalisasi header (hapus spasi, ganti dengan underscore)
+    const headers = lines[0].split(",").map(h => h.trim().replace(/\s+/g, "_"));
+
     return lines.slice(1).map(line => {
       const vals = line.split(",");
       const obj = {};
-      headers.forEach((h,i) => obj[h.trim()] = vals[i].trim());
+      headers.forEach((h, i) => obj[h] = (vals[i] || "").trim());
       return obj;
     });
   }
@@ -91,12 +102,14 @@
     tbody.innerHTML = '';
     data.forEach(row => {
       const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${row.Tanggal}</td>
-                      <td>${row.Wali_Kelas}</td>
-                      <td>${row.Mata_Pelajaran}</td>
-                      <td>${row.Kelas}</td>
-                      <td>${row.Nama_Siswa}</td>
-                      <td>${row.Status}</td>`;
+      tr.innerHTML = `
+        <td>${row.Tanggal || ""}</td>
+        <td>${row.Wali_Kelas || ""}</td>
+        <td>${row.Mata_Pelajaran || ""}</td>
+        <td>${row.Kelas || ""}</td>
+        <td>${row.Nama_Siswa || ""}</td>
+        <td>${row.Status || ""}</td>
+      `;
       tbody.appendChild(tr);
     });
   }
@@ -104,8 +117,8 @@
   async function populateFilters() {
     const data = await loadRekapData();
 
-    const kelasSet = new Set(data.map(d => d.Kelas));
-    const mapelSet = new Set(data.map(d => d.Mata_Pelajaran));
+    const kelasSet = new Set(data.map(d => d.Kelas).filter(Boolean));
+    const mapelSet = new Set(data.map(d => d.Mata_Pelajaran).filter(Boolean));
 
     const kelasSelect = document.getElementById('filterKelas');
     kelasSet.forEach(k => kelasSelect.innerHTML += `<option value="${k}">${k}</option>`);
@@ -125,7 +138,7 @@
         (!kelas || d.Kelas === kelas) &&
         (!mapel || d.Mata_Pelajaran === mapel) &&
         (!status || d.Status === status) &&
-        (!search || d.Nama_Siswa.toLowerCase().includes(search))
+        (!search || (d.Nama_Siswa || "").toLowerCase().includes(search))
       );
       renderTable(filtered);
     });
