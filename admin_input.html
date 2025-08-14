@@ -14,8 +14,8 @@ body { font-family: "Inter", sans-serif; background-color: #f8f9fa; color: #2c3e
 </head>
 <body>
 
-<!-- Notifikasi -->
-<div id="notifContainer" class="container mt-2"></div>
+<!-- Toast Container -->
+<div id="toastContainer" class="position-fixed top-50 start-50 translate-middle" style="z-index: 1080;"></div>
 
 <div id="navbarContainer"></div>
 
@@ -35,15 +35,9 @@ body { font-family: "Inter", sans-serif; background-color: #f8f9fa; color: #2c3e
         <tbody>
           <tr>
             <td><input type="date" id="tanggal" class="form-control"></td>
-            <td>
-              <select id="waliKelas" class="form-select"><option value="">Pilih Wali Kelas</option></select>
-            </td>
-            <td>
-              <select id="mataPelajaran" class="form-select"><option value="">Pilih Mata Pelajaran</option></select>
-            </td>
-            <td>
-              <select id="kelas" class="form-select"><option value="">Pilih Kelas</option></select>
-            </td>
+            <td><select id="waliKelas" class="form-select"><option value="">Pilih Wali Kelas</option></select></td>
+            <td><select id="mataPelajaran" class="form-select"><option value="">Pilih Mata Pelajaran</option></select></td>
+            <td><select id="kelas" class="form-select"><option value="">Pilih Kelas</option></select></td>
           </tr>
         </tbody>
       </table>
@@ -61,8 +55,8 @@ body { font-family: "Inter", sans-serif; background-color: #f8f9fa; color: #2c3e
         <tbody id="siswaTableBody"></tbody>
       </table>
       <div class="mb-2">
-        <button class="btn btn-success btn-sm" onclick="setStatusSemua('Tuntas')">Tuntas Semua</button>
-        <button class="btn btn-danger btn-sm" onclick="setStatusSemua('Ujian')">Ujian Semua</button>
+        <button class="btn btn-secondary btn-sm" onclick="setStatusSemua('Tuntas')">Tuntas Semua</button>
+        <button class="btn btn-secondary btn-sm" onclick="setStatusSemua('Ujian')">Ujian Semua</button>
       </div>
     </div>
 
@@ -83,21 +77,29 @@ fetch('navbar_admin.html')
 .then(res => res.text())
 .then(html => document.getElementById('navbarContainer').innerHTML = html);
 
-const notifContainer = document.getElementById('notifContainer');
 const waliKelasSelect = document.getElementById('waliKelas');
 const kelasSelect = document.getElementById('kelas');
 const mataPelajaranSelect = document.getElementById('mataPelajaran');
 const siswaTableBody = document.getElementById('siswaTableBody');
 const saveTableBtn = document.getElementById('saveTableBtn');
 
-// --- Fungsi notifikasi ---
-function showNotif(message, type='success'){
-  notifContainer.innerHTML = `
-    <div class="alert alert-${type} alert-dismissible fade show" role="alert">
-      ${message}
-      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+// --- Fungsi toast ---
+function showToast(message, type='success', delay=3000){
+  const toastContainer = document.getElementById('toastContainer');
+  const toastId = 'toast' + Date.now();
+  const toastHTML = `
+    <div id="${toastId}" class="toast align-items-center text-bg-${type} border-0 mb-2" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body">${message}</div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
     </div>
   `;
+  toastContainer.insertAdjacentHTML('beforeend', toastHTML);
+  const toastEl = document.getElementById(toastId);
+  const bsToast = new bootstrap.Toast(toastEl, { delay: delay });
+  bsToast.show();
+  toastEl.addEventListener('hidden.bs.toast', ()=>toastEl.remove());
 }
 
 // --- Fetch Wali Kelas & Kelas ---
@@ -150,7 +152,7 @@ async function fetchSiswaPerKelas(kelasTerpilih){
 function updateStatusColor(selectEl){
   if(selectEl.value === "Tuntas") selectEl.style.color = "#198754"; // hijau
   else if(selectEl.value === "Ujian") selectEl.style.color = "#dc3545"; // merah
-  else selectEl.style.color = "#000"; // hitam
+  else selectEl.style.color = "#000"; // hitam default
 }
 
 // --- Update tabel siswa saat pilih kelas ---
@@ -184,8 +186,8 @@ function setStatusSemua(value){
     sel.value = value;
     updateStatusColor(sel);
   });
+  showToast(`Semua siswa diubah menjadi "${value}"`, "info");
   cekDataLengkap();
-  showNotif(`Semua siswa diubah menjadi "${value}"`, "info");
 }
 
 // --- Cek data lengkap ---
@@ -207,7 +209,7 @@ siswaTableBody.addEventListener('change', cekDataLengkap);
 // --- Simpan data ke Apps Script ---
 saveTableBtn.addEventListener('click', ()=>{
   if(saveTableBtn.disabled){
-    showNotif("Form belum lengkap!", "warning");
+    showToast("Form belum lengkap!", "warning");
     return;
   }
 
@@ -222,7 +224,7 @@ saveTableBtn.addEventListener('click', ()=>{
     formData.siswa.push({nama: sel.dataset.siswa, status: sel.value});
   });
 
-  showNotif("Mengirim data...", "info");
+  showToast("Mengirim data...", "info");
 
   fetch('https://script.google.com/macros/s/AKfycbxtv-QilDJHlHYU0oHKnLc8eJymm9wufTpcsej1iXDZXo9hndOwUTUqmCPz0fG0Xbpr/exec', {
     method: 'POST',
@@ -232,8 +234,7 @@ saveTableBtn.addEventListener('click', ()=>{
   .then(res => res.json())
   .then(res => {
     if(res.result === "success") {
-      showNotif("Data berhasil disimpan!", "success");
-      // Reset semua form
+      showToast("Data berhasil disimpan!", "success");
       document.getElementById('tanggal').value = '';
       waliKelasSelect.value = '';
       mataPelajaranSelect.value = '';
@@ -241,12 +242,12 @@ saveTableBtn.addEventListener('click', ()=>{
       siswaTableBody.innerHTML = '';
       saveTableBtn.disabled = true;
     } else {
-      showNotif("Gagal menyimpan data: " + res.message, "danger");
+      showToast("Gagal menyimpan data: " + res.message, "danger");
     }
   })
   .catch(err => {
     console.error(err);
-    showNotif("Terjadi error saat menyimpan.", "danger");
+    showToast("Terjadi error saat menyimpan.", "danger");
   });
 });
 </script>
