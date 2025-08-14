@@ -8,6 +8,10 @@
 </head>
 <body>
 
+<!-- Navbar Publik -->
+<div id="navbarContainer" class="mb-4"></div>
+
+<!-- Card + Table -->
 <div class="container my-4">
   <div class="card">
     <div class="card-header">Data KBM Siswa</div>
@@ -33,31 +37,42 @@
   </div>
 </div>
 
+<!-- Footer -->
 <footer class="text-center py-3 border-top mt-4">
   © 2025 SIALAN – Sistem Analisis Laporan KBM Siswa
 </footer>
 
+<!-- JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+
 <script>
-// Ambil CSV
+// Load Navbar Publik
+fetch('navbar_publik.html')
+  .then(resp => resp.text())
+  .then(html => document.getElementById('navbarContainer').innerHTML = html)
+  .then(() => feather.replace());
+
+// Ambil data CSV dari Google Sheets
 async function fetchSheetData() {
   const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQAEwBLEhaehGYlzYsNhBPfmozGvRZmpjyEOHC8rfgduB0JRurz-xwI_jfW8Fw8Vaz93a_E9tLyuIX9/pub?gid=0&single=true&output=csv";
   const res = await fetch(url);
   const csvText = await res.text();
-  const lines = csvText.split("\n").filter(l=>l.trim()!=="");
+  const lines = csvText.split("\n").filter(l => l.trim() !== "");
   const headers = lines[0].split(",");
-  return lines.slice(1).map(line=>{
+  return lines.slice(1).map(line => {
     const vals = line.split(",");
     const obj = {};
-    headers.forEach((h,i)=>obj[h.trim()] = vals[i]?.trim() ?? "");
+    headers.forEach((h, i) => obj[h.trim()] = vals[i]?.trim() ?? "");
     return obj;
   });
 }
 
-// Render tabel
-fetchSheetData().then(data=>{
+// Render tabel ke halaman
+fetchSheetData().then(data => {
   const tbody = document.getElementById('dataTable');
   tbody.innerHTML = "";
-  data.forEach(row=>{
+  data.forEach(row => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>${row.Tanggal || ""}</td>
@@ -72,6 +87,5 @@ fetchSheetData().then(data=>{
 });
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
