@@ -11,10 +11,6 @@
 body { font-family:"Inter", sans-serif; background-color:#fdfdfd; color:#2c3e50; margin:0; padding:0; }
 footer { text-align:center; padding:20px 0; font-size:0.9rem; color:#6c757d; border-top:1px solid #e9ecef; background: linear-gradient(90deg,#ffffff,#f8f8f8); box-shadow: 0 -2px 6px rgba(0,0,0,0.04); }
 section.container { background-color:#ffffff; border-radius:15px; padding:30px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); }
-.btn-phoenix { font-weight:600; border-radius:12px; padding:0.6rem 1.4rem; margin-right:10px; cursor:pointer; border:none; transition: all 0.25s ease-in-out; color:#fff; box-shadow: 0 6px 18px rgba(0,0,0,0.08);}
-.btn-login { background: linear-gradient(145deg,#6c63ff,#5a54d1);}
-.btn-login:hover { transform: translateY(-2px); box-shadow:0 8px 22px rgba(0,0,0,0.12);}
-.badge-status { font-weight:600; margin-right:0.5rem; }
 #barChart { box-shadow:0 10px 20px rgba(0,0,0,0.08); border-radius:12px; }
 </style>
 </head>
@@ -24,8 +20,7 @@ section.container { background-color:#ffffff; border-radius:15px; padding:30px; 
 
 <section class="container my-4">
   <h2 class="mb-4">Statistik Siswa Tuntas / Ujian per Mata Pelajaran</h2>
-  <canvas id="barChart" height="150"></canvas>
-  <div id="statusBadges" class="mt-3"></div>
+  <canvas id="barChart" height="180"></canvas>
 </section>
 
 <footer>
@@ -44,7 +39,7 @@ fetch('navbar_publik.html')
   .then(html => document.getElementById('navbar').innerHTML = html)
   .then(()=> feather.replace());
 
-// ===== Fetch CSV Data =====
+// Fetch CSV Data
 async function fetchSheetData() {
   const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQAEwBLEhaehGYlzYsNhBPfmozGvRZmpjyEOHC8rfgduB0JRurz-xwI_jfW8Fw8Vaz93a_E9tLyuIX9/pub?gid=0&single=true&output=csv";
   const res = await fetch(url);
@@ -59,7 +54,7 @@ async function fetchSheetData() {
   });
 }
 
-// ===== Render Chart per Mapel =====
+// Render Chart dengan angka di atas batang
 fetchSheetData().then(data=>{
   const mapelLabels = [...new Set(data.map(d=>d.Mata_Pelajaran))];
   const tuntasData = mapelLabels.map(mp => data.filter(d=>d.Mata_Pelajaran===mp && d.Status==="Tuntas").length);
@@ -81,21 +76,21 @@ fetchSheetData().then(data=>{
         title:{
           display:true,
           text:'Jumlah Siswa Tuntas / Ujian per Mata Pelajaran',
-          font:{size:18, weight:'bold'}
+          font:{size:20, weight:'bold'}
         },
         legend:{position:'top'},
         tooltip:{
           mode:'index',
           intersect:false,
           callbacks:{
-            label: context => `${context.dataset.label}: ${context.parsed.y} siswa`
+            label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y} siswa`
           }
         },
         datalabels:{
           anchor:'end',
           align:'end',
           color:'#000',
-          font:{weight:'bold'},
+          font:{weight:'bold', size:14},
           formatter:value => value > 0 ? value : ''
         }
       },
@@ -103,18 +98,10 @@ fetchSheetData().then(data=>{
       scales:{
         x:{stacked:true, grid:{display:false}},
         y:{stacked:true, beginAtZero:true, ticks:{stepSize:1}}
-      },
-      animation:{duration:1000, easing:'easeOutQuart'}
+      }
     },
     plugins:[ChartDataLabels]
   });
-
-  // Badge Status
-  const totalTuntas = data.filter(d=>d.Status==="Tuntas").length;
-  const totalUjian   = data.filter(d=>d.Status==="Ujian").length;
-  document.getElementById('statusBadges').innerHTML=
-    `<span class="badge bg-success badge-status">Tuntas: ${totalTuntas}</span>
-     <span class="badge bg-danger badge-status">Ujian: ${totalUjian}</span>`;
 });
 </script>
 
