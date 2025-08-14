@@ -15,6 +15,7 @@ section.container { background-color:#ffffff; border-radius:15px; padding:30px; 
 .btn-login { background: linear-gradient(145deg,#6c63ff,#5a54d1);}
 .btn-login:hover { transform: translateY(-2px); box-shadow:0 8px 22px rgba(0,0,0,0.12);}
 .badge-status { font-weight:600; margin-right:0.5rem; }
+#barChart { box-shadow:0 10px 20px rgba(0,0,0,0.08); border-radius:12px; }
 </style>
 </head>
 <body>
@@ -61,6 +62,7 @@ section.container { background-color:#ffffff; border-radius:15px; padding:30px; 
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
 
 <script>
@@ -70,7 +72,7 @@ fetch('navbar_publik.html')
   .then(html => document.getElementById('navbar').innerHTML = html)
   .then(()=> feather.replace());
 
-// ===== Fetch CSV Data untuk Statistik =====
+// ===== Fetch CSV Data =====
 async function fetchSheetData() {
   const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQAEwBLEhaehGYlzYsNhBPfmozGvRZmpjyEOHC8rfgduB0JRurz-xwI_jfW8Fw8Vaz93a_E9tLyuIX9/pub?gid=0&single=true&output=csv";
   const res = await fetch(url);
@@ -85,34 +87,82 @@ async function fetchSheetData() {
   });
 }
 
-// ===== Render Grafik =====
+// ===== Render Chart =====
 fetchSheetData().then(data=>{
   const kelasLabels = [...new Set(data.map(d=>d.Kelas))].sort();
   const mapelLabels = [...new Set(data.map(d=>d.Mata_Pelajaran))];
+  const colors = ["#198754","#dc3545","#0d6efd","#ffc107","#6f42c1","#fd7e14","#20c997"];
+  const ctx = document.getElementById('barChart').getContext('2d');
   const datasets = [];
-  mapelLabels.forEach(mp=>{
+
+  mapelLabels.forEach((mp, idx)=>{
+    const colorTuntas = colors[idx % colors.length];
+    const colorUjian  = colors[(idx+3) % colors.length];
     const tuntasData = kelasLabels.map(k=>data.filter(d=>d.Kelas===k && d.Mata_Pelajaran===mp && d.Status==="Tuntas").length);
-    const ujianData = kelasLabels.map(k=>data.filter(d=>d.Kelas===k && d.Mata_Pelajaran===mp && d.Status==="Ujian").length);
-    datasets.push({label: mp+" Tuntas", data:tuntasData, backgroundColor:"#198754"});
-    datasets.push({label: mp+" Ujian", data:ujianData, backgroundColor:"#dc3545"});
+    const ujianData  = kelasLabels.map(k=>data.filter(d=>d.Kelas===k && d.Mata_Pelajaran===mp && d.Status==="Ujian").length);
+
+    datasets.push({
+      label: mp+" Tuntas",
+      data: tuntasData,
+      backgroundColor: colorTuntas,
+      borderRadius: 8,
+      borderSkipped: false
+    });
+    datasets.push({
+      label: mp+" Ujian",
+      data: ujianData,
+      backgroundColor: colorUjian,
+      borderRadius: 8,
+      borderSkipped: false
+    });
   });
-  new Chart(document.getElementById('barChart'), {
+
+  new Chart(ctx, {
     type:'bar',
     data:{labels:kelasLabels,datasets:datasets},
     options:{
       responsive:true,
-      plugins:{title:{display:true,text:'Jumlah Siswa Tuntas / Ujian per Kelas & Mata Pelajaran'}},
-      scales:{x:{stacked:true},y:{stacked:true,beginAtZero:true}}
-    }
+      plugins:{
+        title:{
+          display:true,
+          text:'Jumlah Siswa Tuntas / Ujian per Kelas & Mata Pelajaran',
+          font:{size:18, weight:'bold'}
+        },
+        legend:{position:'top', labels:{boxWidth:20, padding:10}},
+        tooltip:{
+          mode:'index',
+          intersect:false,
+          callbacks:{
+            label: function(context){ return `${context.dataset.label}: ${context.parsed.y} siswa`; }
+          }
+        },
+        datalabels:{
+          anchor:'end',
+          align:'end',
+          color:'#000',
+          font:{weight:'bold'},
+          formatter: value => value > 0 ? value : ''
+        }
+      },
+      interaction:{mode:'nearest', axis:'x', intersect:false},
+      scales:{
+        x:{stacked:true, grid:{display:false}, barPercentage:0.6, categoryPercentage:0.7},
+        y:{stacked:true, beginAtZero:true, ticks:{stepSize:1}}
+      },
+      animation:{duration:1000, easing:'easeOutQuart'}
+    },
+    plugins:[ChartDataLabels]
   });
+
+  // Badge Status
   const totalTuntas = data.filter(d=>d.Status==="Tuntas").length;
-  const totalUjian = data.filter(d=>d.Status==="Ujian").length;
+  const totalUjian   = data.filter(d=>d.Status==="Ujian").length;
   document.getElementById('statusBadges').innerHTML=
     `<span class="badge bg-success badge-status">Tuntas: ${totalTuntas}</span>
      <span class="badge bg-danger badge-status">Ujian: ${totalUjian}</span>`;
 });
 
-// ===== Modal Login: Ambil username/password dari CSV =====
+// ===== Modal Login =====
 let userCredentials = [];
 async function loadCredentials() {
   const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQXOP4L2k61miTcFTlb4r0QigIWRsMzVazznXCbNLqaHBpwY9RKgjnXdW4figjJZLmrrPcXbU6Q1f-E/pub?gid=1201461529&single=true&output=csv";
@@ -121,14 +171,13 @@ async function loadCredentials() {
   const lines = csvText.split("\n").slice(1);
   lines.forEach(line=>{
     const cols = line.split(",");
-    const username = cols[2]?.trim(); // kolom C
-    const password = cols[3]?.trim(); // kolom D
+    const username = cols[2]?.trim(); 
+    const password = cols[3]?.trim(); 
     if(username && password) userCredentials.push({username,password});
   });
 }
 loadCredentials();
 
-// Validasi login
 document.getElementById('loginForm').addEventListener('submit', function(e){
   e.preventDefault();
   const inputUser = document.getElementById('username').value.trim();
@@ -146,4 +195,3 @@ document.getElementById('loginForm').addEventListener('submit', function(e){
 
 </body>
 </html>
-
