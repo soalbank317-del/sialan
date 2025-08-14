@@ -113,19 +113,29 @@ fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vQXOP4L2k61miTcFTlb4r0Qig
     });
 });
 
-// --- Contoh Data siswa per kelas ---
-const siswaPerKelas = {
-  "7A":["Ahmad","Budi","Citra"],
-  "7B":["Dewi","Eka","Fajar"]
-};
+// --- Fetch Nama Siswa per Kelas dari Spreadsheet ---
+async function fetchSiswaPerKelas(kelasTerpilih){
+  const url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQXOP4L2k61miTcFTlb4r0QigIWRsMzVazznXCbNLqaHBpwY9RKgjnXdW4figjJZLmrrPcXbU6Q1f-E/pub?gid=852230839&single=true&output=csv';
+  const res = await fetch(url);
+  const csvText = await res.text();
+  const lines = csvText.split("\n").slice(1);
+  const siswaList = [];
+  lines.forEach(line=>{
+    const cols = line.split(",");
+    const kelas = cols[0]?.trim();
+    const nama = cols[1]?.trim();
+    if(kelas === kelasTerpilih && nama) siswaList.push(nama);
+  });
+  return siswaList;
+}
 
 // --- Show Modal saat pilih kelas ---
-kelasSelect.addEventListener('change', ()=>{
+kelasSelect.addEventListener('change', async ()=>{
   const k = kelasSelect.value;
   if(!k) return;
 
+  const siswaList = await fetchSiswaPerKelas(k);
   siswaForm.innerHTML = '';
-  const siswaList = siswaPerKelas[k] || [];
   siswaList.forEach(s=>{
     const div = document.createElement('div');
     div.classList.add('mb-2');
