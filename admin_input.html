@@ -61,8 +61,8 @@ body { font-family: "Inter", sans-serif; background-color: #f8f9fa; color: #2c3e
         <tbody id="siswaTableBody"></tbody>
       </table>
       <div class="mb-2">
-        <button class="btn btn-success btn-sm" onclick="setStatusSemua('Tuntas')">Tuntas Semua</button>
-        <button class="btn btn-danger btn-sm" onclick="setStatusSemua('Ujian')">Ujian Semua</button>
+        <button class="btn btn-secondary btn-sm" onclick="setStatusSemua('Tuntas')">Tuntas Semua</button>
+        <button class="btn btn-secondary btn-sm" onclick="setStatusSemua('Ujian')">Ujian Semua</button>
       </div>
     </div>
 
@@ -146,6 +146,14 @@ async function fetchSiswaPerKelas(kelasTerpilih){
   return siswaList;
 }
 
+// --- Fungsi pewarnaan status ---
+function updateStatusColor(selectEl){
+  const td = selectEl.parentElement;
+  if(selectEl.value === "Tuntas") td.style.backgroundColor = "#d4edda";
+  else if(selectEl.value === "Ujian") td.style.backgroundColor = "#f8d7da";
+  else td.style.backgroundColor = "";
+}
+
 // --- Update tabel siswa saat pilih kelas ---
 kelasSelect.addEventListener('change', async ()=>{
   const k = kelasSelect.value;
@@ -164,17 +172,23 @@ kelasSelect.addEventListener('change', async ()=>{
       </td>
     `;
     siswaTableBody.appendChild(tr);
+    const selectEl = tr.querySelector('select');
+    updateStatusColor(selectEl);
+    selectEl.addEventListener('change', ()=>updateStatusColor(selectEl));
   });
   cekDataLengkap();
 });
 
 // --- Tombol Semua Tuntas / Semua Ujian ---
 function setStatusSemua(value){
-  siswaTableBody.querySelectorAll('select').forEach(sel=>sel.value = value);
+  siswaTableBody.querySelectorAll('select').forEach(sel=>{
+    sel.value = value;
+    updateStatusColor(sel);
+  });
   cekDataLengkap();
 }
 
-// --- Cek data lengkap untuk enable tombol simpan ---
+// --- Cek data lengkap ---
 function cekDataLengkap(){
   const tanggal = document.getElementById('tanggal').value;
   const waliKelas = waliKelasSelect.value;
@@ -192,16 +206,25 @@ siswaTableBody.addEventListener('change', cekDataLengkap);
 
 // --- Simpan data ke Apps Script ---
 saveTableBtn.addEventListener('click', ()=>{
+  const tanggal = document.getElementById('tanggal').value;
+  const waliKelas = waliKelasSelect.value;
+  const mapel = mataPelajaranSelect.value;
+  const kelas = kelasSelect.value;
+  const semuaStatus = Array.from(siswaTableBody.querySelectorAll('select')).every(sel => sel.value);
+  
+  if(!(tanggal && waliKelas && mapel && kelas && semuaStatus && siswaTableBody.querySelectorAll('tr').length>0)){
+    showNotif("Form belum lengkap! Mohon lengkapi semua kolom.", "warning");
+    return;
+  }
+
+  // Disable tombol & notifikasi sedang mengirim
+  saveTableBtn.disabled = true;
+  showNotif("Mengirim data...", "info");
+
   const formData = {
-    tanggal: document.getElementById('tanggal').value,
-    waliKelas: waliKelasSelect.value,
-    mapel: mataPelajaranSelect.value,
-    kelas: kelasSelect.value,
-    siswa: []
+    tanggal, waliKelas, mapel, kelas,
+    siswa: Array.from(siswaTableBody.querySelectorAll('select')).map(sel=>({nama: sel.dataset.siswa, status: sel.value}))
   };
-  siswaTableBody.querySelectorAll('select').forEach(sel=>{
-    formData.siswa.push({nama: sel.dataset.siswa, status: sel.value});
-  });
 
   fetch('https://script.google.com/macros/s/AKfycbxtv-QilDJHlHYU0oHKnLc8eJymm9wufTpcsej1iXDZXo9hndOwUTUqmCPz0fG0Xbpr/exec', {
     method: 'POST',
@@ -218,7 +241,6 @@ saveTableBtn.addEventListener('click', ()=>{
       mataPelajaranSelect.value = '';
       kelasSelect.value = '';
       siswaTableBody.innerHTML = '';
-      saveTableBtn.disabled = true;
     } else {
       showNotif("Gagal menyimpan data: " + res.message, "danger");
     }
@@ -226,10 +248,11 @@ saveTableBtn.addEventListener('click', ()=>{
   .catch(err => {
     console.error(err);
     showNotif("Terjadi error saat menyimpan.", "danger");
+  })
+  .finally(()=>{
+    saveTableBtn.disabled = false;
   });
 });
 </script>
 </body>
 </html>
-
-
