@@ -146,12 +146,11 @@ async function fetchSiswaPerKelas(kelasTerpilih){
   return siswaList;
 }
 
-// --- Fungsi pewarnaan status ---
+// --- Fungsi pewarnaan teks status ---
 function updateStatusColor(selectEl){
-  const td = selectEl.parentElement;
-  if(selectEl.value === "Tuntas") td.style.backgroundColor = "#d4edda";
-  else if(selectEl.value === "Ujian") td.style.backgroundColor = "#f8d7da";
-  else td.style.backgroundColor = "";
+  if(selectEl.value === "Tuntas") selectEl.style.color = "#198754"; // hijau
+  else if(selectEl.value === "Ujian") selectEl.style.color = "#dc3545"; // merah
+  else selectEl.style.color = "#000"; // default hitam
 }
 
 // --- Update tabel siswa saat pilih kelas ---
@@ -206,25 +205,24 @@ siswaTableBody.addEventListener('change', cekDataLengkap);
 
 // --- Simpan data ke Apps Script ---
 saveTableBtn.addEventListener('click', ()=>{
-  const tanggal = document.getElementById('tanggal').value;
-  const waliKelas = waliKelasSelect.value;
-  const mapel = mataPelajaranSelect.value;
-  const kelas = kelasSelect.value;
-  const semuaStatus = Array.from(siswaTableBody.querySelectorAll('select')).every(sel => sel.value);
-  
-  if(!(tanggal && waliKelas && mapel && kelas && semuaStatus && siswaTableBody.querySelectorAll('tr').length>0)){
-    showNotif("Form belum lengkap! Mohon lengkapi semua kolom.", "warning");
+  // Cek dulu form lengkap
+  if(saveTableBtn.disabled){
+    showNotif("Form belum lengkap!", "warning");
     return;
   }
 
-  // Disable tombol & notifikasi sedang mengirim
-  saveTableBtn.disabled = true;
-  showNotif("Mengirim data...", "info");
-
   const formData = {
-    tanggal, waliKelas, mapel, kelas,
-    siswa: Array.from(siswaTableBody.querySelectorAll('select')).map(sel=>({nama: sel.dataset.siswa, status: sel.value}))
+    tanggal: document.getElementById('tanggal').value,
+    waliKelas: waliKelasSelect.value,
+    mapel: mataPelajaranSelect.value,
+    kelas: kelasSelect.value,
+    siswa: []
   };
+  siswaTableBody.querySelectorAll('select').forEach(sel=>{
+    formData.siswa.push({nama: sel.dataset.siswa, status: sel.value});
+  });
+
+  showNotif("Mengirim data...", "info");
 
   fetch('https://script.google.com/macros/s/AKfycbxtv-QilDJHlHYU0oHKnLc8eJymm9wufTpcsej1iXDZXo9hndOwUTUqmCPz0fG0Xbpr/exec', {
     method: 'POST',
@@ -241,6 +239,7 @@ saveTableBtn.addEventListener('click', ()=>{
       mataPelajaranSelect.value = '';
       kelasSelect.value = '';
       siswaTableBody.innerHTML = '';
+      saveTableBtn.disabled = true;
     } else {
       showNotif("Gagal menyimpan data: " + res.message, "danger");
     }
@@ -248,9 +247,6 @@ saveTableBtn.addEventListener('click', ()=>{
   .catch(err => {
     console.error(err);
     showNotif("Terjadi error saat menyimpan.", "danger");
-  })
-  .finally(()=>{
-    saveTableBtn.disabled = false;
   });
 });
 </script>
