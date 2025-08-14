@@ -114,21 +114,19 @@ footer {
 // --- Login Admin ---
 const loginLink = document.getElementById('loginLink');
 loginLink.addEventListener('click', function(e) {
-  e.preventDefault(); // penting agar tidak langsung buka halaman
+  e.preventDefault(); // mencegah link langsung buka halaman
   const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
   loginModal.show();
 });
 
-// Ganti ini dengan link CSV publikmu yang benar
-const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQXOP4L2k61miTcFTlb4r0QigIWRsMzVazznXCbNLqaHBpwY9RKgjnXdW4figjJZLmrrPcXbU6Q1f-E/pub?gid=1201461529&single=true&output=csv';
+const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQXOP4L2k61miTcFTlb4r0QigIWRsMzVazznXCbNLqaHBpwY9RKgjnXdW4figjJZLmrrPcXbU6Q1f-E/pub?gid=1840020379&single=true&output=csv';
 let userData = [];
 
 Papa.parse(csvUrl, {
   download: true,
-  header: true,
+  header: false, // tidak pakai header
   complete: function(results) {
-    userData = results.data;
-    console.log("Data pengguna:", userData); // debug
+    userData = results.data; // userData adalah array array
   }
 });
 
@@ -137,9 +135,8 @@ document.getElementById('loginForm').addEventListener('submit', function(e) {
   const usernameInput = document.getElementById('username').value.trim();
   const passwordInput = document.getElementById('password').value.trim();
 
-  const validUser = userData.find(user =>
-    user['Username'] === usernameInput && user['Password'] === passwordInput
-  );
+  // Cek username & password berdasarkan kolom A dan B
+  const validUser = userData.find(user => user[0] === usernameInput && user[1] === passwordInput);
 
   if(validUser) {
     sessionStorage.setItem('user', usernameInput);
@@ -148,7 +145,7 @@ document.getElementById('loginForm').addEventListener('submit', function(e) {
     alert('Username atau Password salah');
   }
 });
-
+    
 // --- Statistik KBM ---
 async function fetchSheetData() {
   const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQAEwBLEhaehGYlzYsNhBPfmozGvRZmpjyEOHC8rfgduB0JRurz-xwI_jfW8Fw8Vaz93a_E9tLyuIX9/pub?gid=0&single=true&output=csv";
@@ -195,4 +192,5 @@ fetchSheetData().then(data => {
 
 </body>
 </html>
+
 
