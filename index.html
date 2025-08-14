@@ -61,6 +61,11 @@ fetchSheetData().then(data=>{
   const ujianData  = mapelLabels.map(mp => data.filter(d=>d.Mata_Pelajaran===mp && d.Status==="Ujian").length);
 
   const ctx = document.getElementById('barChart').getContext('2d');
+
+  // Hitung lebar batang otomatis
+  let barPercentage = Math.min(0.9, 9 / mapelLabels.length); // misal maksimal 0.9, semakin banyak mapel → lebih kecil
+  let categoryPercentage = Math.min(0.9, 8 / mapelLabels.length);
+
   new Chart(ctx, {
     type:'bar',
     data:{
@@ -96,7 +101,12 @@ fetchSheetData().then(data=>{
       },
       interaction:{mode:'nearest', axis:'x', intersect:false},
       scales:{
-        x:{stacked:false, grid:{display:false}}, // stacked:false → batang berdampingan
+        x:{
+          stacked:false,
+          grid:{display:false},
+          barPercentage: barPercentage,
+          categoryPercentage: categoryPercentage
+        },
         y:{stacked:false, beginAtZero:true, ticks:{stepSize:1}}
       }
     },
@@ -107,4 +117,3 @@ fetchSheetData().then(data=>{
 
 </body>
 </html>
-
