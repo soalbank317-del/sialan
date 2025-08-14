@@ -2,7 +2,7 @@
 <nav class="navbar navbar-expand-lg shadow-sm">
   <div class="container">
     <a class="navbar-brand fw-bold" href="#">SIALAN – Admin Panel</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarAdminMenu">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarAdminMenu" aria-controls="navbarAdminMenu" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarAdminMenu">
@@ -22,17 +22,14 @@
 </nav>
 
 <!-- Overlay Blur -->
-<div id="overlayBlur" 
-     class="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 d-none" 
-     style="backdrop-filter: blur(4px); z-index: 1999;">
-</div>
+<div id="overlayBlur" class="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 d-none" style="backdrop-filter: blur(4px); z-index: 1999;"></div>
 
 <!-- Toast Konfirmasi Logout -->
 <div class="position-fixed top-50 start-50 translate-middle p-3 d-none" id="toastWrapper" style="z-index: 2000;">
-  <div id="logoutToast" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+  <div id="logoutToast" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
     <div class="toast-header bg-danger text-white">
       <strong class="me-auto">Konfirmasi Logout</strong>
-      <button type="button" class="btn-close btn-close-white" id="closeToast"></button>
+      <button type="button" class="btn-close btn-close-white" aria-label="Close" id="closeToast"></button>
     </div>
     <div class="toast-body">
       Anda yakin ingin logout?
@@ -48,23 +45,27 @@
 document.addEventListener("DOMContentLoaded", () => {
   const overlay = document.getElementById('overlayBlur');
   const toastWrapper = document.getElementById('toastWrapper');
+  const logoutToastEl = document.getElementById('logoutToast');
   const logoutBtn = document.getElementById('logoutBtn');
   const closeToast = document.getElementById('closeToast');
   const cancelLogout = document.getElementById('cancelLogout');
   const confirmLogout = document.getElementById('confirmLogout');
 
+  const logoutToast = new bootstrap.Toast(logoutToastEl);
+
   function showLogoutToast() {
     overlay.classList.remove('d-none');
     toastWrapper.classList.remove('d-none');
-    new bootstrap.Toast(document.getElementById('logoutToast')).show();
+    logoutToast.show();
   }
 
   function hideLogoutToast() {
     overlay.classList.add('d-none');
     toastWrapper.classList.add('d-none');
+    logoutToast.hide();
   }
 
-  logoutBtn?.addEventListener('click', function(e) {
+  logoutBtn?.addEventListener('click', (e) => {
     e.preventDefault();
     showLogoutToast();
   });
@@ -73,7 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
   cancelLogout?.addEventListener('click', hideLogoutToast);
   overlay?.addEventListener('click', hideLogoutToast);
 
-  confirmLogout?.addEventListener('click', function() {
+  confirmLogout?.addEventListener('click', () => {
     window.location.href = "https://soalbank317-del.github.io/sialan/index.html";
   });
 });
