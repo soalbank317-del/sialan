@@ -1,7 +1,7 @@
 <!-- navbar admin.html -->
 <nav class="navbar navbar-expand-lg shadow-sm">
   <div class="container">
-    <a class="navbar-brand fw-bold"href="">SIALAN – Admin Panel</a>
+    <a class="navbar-brand fw-bold" href="#">SIALAN – Admin Panel</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarAdminMenu">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -14,7 +14,7 @@
           <a class="nav-link" href="admin_rekap.html">Rekap Data KBM</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="index.html" id="logoutBtn">Logout</a>
+          <a class="nav-link" href="#" id="logoutBtn">Logout</a>
         </li>
       </ul>
     </div>
@@ -29,7 +29,7 @@
 
 <!-- Toast Konfirmasi Logout -->
 <div class="position-fixed top-50 start-50 translate-middle p-3 d-none" id="toastWrapper" style="z-index: 2000;">
-  <div id="logoutToast" class="toast align-items-center text-white bg-danger border-0 show" role="alert" aria-live="assertive" aria-atomic="true">
+  <div id="logoutToast" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
     <div class="toast-header bg-danger text-white">
       <strong class="me-auto">Konfirmasi Logout</strong>
       <button type="button" class="btn-close btn-close-white" id="closeToast"></button>
@@ -44,39 +44,37 @@
   </div>
 </div>
 
-<!-- Script -->
 <script>
-const overlay = document.getElementById('overlayBlur');
-const toastWrapper = document.getElementById('toastWrapper');
-const logoutBtn = document.getElementById('logoutBtn');
-const closeToast = document.getElementById('closeToast');
-const cancelLogout = document.getElementById('cancelLogout');
-const confirmLogout = document.getElementById('confirmLogout');
+document.addEventListener("DOMContentLoaded", () => {
+  const overlay = document.getElementById('overlayBlur');
+  const toastWrapper = document.getElementById('toastWrapper');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const closeToast = document.getElementById('closeToast');
+  const cancelLogout = document.getElementById('cancelLogout');
+  const confirmLogout = document.getElementById('confirmLogout');
 
-function showLogoutToast() {
-  overlay.classList.remove('d-none');
-  toastWrapper.classList.remove('d-none');
-}
+  function showLogoutToast() {
+    overlay.classList.remove('d-none');
+    toastWrapper.classList.remove('d-none');
+    new bootstrap.Toast(document.getElementById('logoutToast')).show();
+  }
 
-function hideLogoutToast() {
-  overlay.classList.add('d-none');
-  toastWrapper.classList.add('d-none');
-}
+  function hideLogoutToast() {
+    overlay.classList.add('d-none');
+    toastWrapper.classList.add('d-none');
+  }
 
-logoutBtn.addEventListener('click', function(e) {
-  e.preventDefault();
-  showLogoutToast();
-});
+  logoutBtn?.addEventListener('click', function(e) {
+    e.preventDefault();
+    showLogoutToast();
+  });
 
-closeToast.addEventListener('click', hideLogoutToast);
-cancelLogout.addEventListener('click', hideLogoutToast);
-overlay.addEventListener('click', hideLogoutToast);
+  closeToast?.addEventListener('click', hideLogoutToast);
+  cancelLogout?.addEventListener('click', hideLogoutToast);
+  overlay?.addEventListener('click', hideLogoutToast);
 
-confirmLogout.addEventListener('click', function() {
-  window.location.href = "https://soalbank317-del.github.io/sialan/index.html";
+  confirmLogout?.addEventListener('click', function() {
+    window.location.href = "https://soalbank317-del.github.io/sialan/index.html";
+  });
 });
 </script>
-
-
-
-
