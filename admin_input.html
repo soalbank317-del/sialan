@@ -61,8 +61,8 @@ body { font-family: "Inter", sans-serif; background-color: #f8f9fa; color: #2c3e
         <tbody id="siswaTableBody"></tbody>
       </table>
       <div class="mb-2">
-        <button class="btn btn-secondary btn-sm" onclick="setStatusSemua('Tuntas')">Tuntas Semua</button>
-        <button class="btn btn-secondary btn-sm" onclick="setStatusSemua('Ujian')">Ujian Semua</button>
+        <button class="btn btn-success btn-sm" onclick="setStatusSemua('Tuntas')">Tuntas Semua</button>
+        <button class="btn btn-danger btn-sm" onclick="setStatusSemua('Ujian')">Ujian Semua</button>
       </div>
     </div>
 
@@ -150,7 +150,7 @@ async function fetchSiswaPerKelas(kelasTerpilih){
 function updateStatusColor(selectEl){
   if(selectEl.value === "Tuntas") selectEl.style.color = "#198754"; // hijau
   else if(selectEl.value === "Ujian") selectEl.style.color = "#dc3545"; // merah
-  else selectEl.style.color = "#000"; // default hitam
+  else selectEl.style.color = "#000"; // hitam
 }
 
 // --- Update tabel siswa saat pilih kelas ---
@@ -185,6 +185,7 @@ function setStatusSemua(value){
     updateStatusColor(sel);
   });
   cekDataLengkap();
+  showNotif(`Semua siswa diubah menjadi "${value}"`, "info");
 }
 
 // --- Cek data lengkap ---
@@ -205,7 +206,6 @@ siswaTableBody.addEventListener('change', cekDataLengkap);
 
 // --- Simpan data ke Apps Script ---
 saveTableBtn.addEventListener('click', ()=>{
-  // Cek dulu form lengkap
   if(saveTableBtn.disabled){
     showNotif("Form belum lengkap!", "warning");
     return;
