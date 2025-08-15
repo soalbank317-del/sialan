@@ -78,13 +78,13 @@ function renderTablePage(page){
 // ===========================================
 function applyFilters(){
   const kelas = document.getElementById('filterKelas').value;
-  const mapel = document.getElementById('filterMapel').value;
+  const matapelajaran = document.getElementById('filtermatapelajaran').value;
   const status = document.getElementById('filterStatus').value;
   const search = document.getElementById('searchNama').value.toLowerCase();
 
   filteredData = allData.filter(d =>
     (!kelas || d.Kelas===kelas) &&
-    (!mapel || d.Mata_Pelajaran===mapel) &&
+    (!matapelajaran || d.Mata_Pelajaran===matapelajaran) &&
     (!status || d.Status===status) &&
     (!search || (d.Nama_Siswa||"").toLowerCase().includes(search))
   );
@@ -104,9 +104,9 @@ async function init(){
 
   // Populate filter options
   const kelasSet = new Set(allData.map(d=>d.Kelas).filter(Boolean));
-  const mapelSet = new Set(allData.map(d=>d.Mata_Pelajaran).filter(Boolean));
+  const matapelajaranSet = new Set(allData.map(d=>d.Mata_Pelajaran).filter(Boolean));
   kelasSet.forEach(k => document.getElementById('filterKelas').innerHTML += `<option value="${k}">${k}</option>`);
-  mapelSet.forEach(m => document.getElementById('filterMapel').innerHTML += `<option value="${m}">${m}</option>`);
+  matapelajaranSet.forEach(m => document.getElementById('filterMatapelajaran').innerHTML += `<option value="${m}">${m}</option>`);
 
   renderTablePage(currentPage);
 
@@ -114,7 +114,7 @@ async function init(){
   document.getElementById('applyFilter').addEventListener('click', applyFilters);
   document.getElementById('resetFilter').addEventListener('click', ()=>{
     document.getElementById('filterKelas').value = '';
-    document.getElementById('filterMapel').value = '';
+    document.getElementById('filtermatapelajaran').value = '';
     document.getElementById('filterStatus').value = '';
     document.getElementById('searchNama').value = '';
     filteredData = sortByLatestDate([...allData]);
@@ -138,3 +138,4 @@ async function init(){
 
 // Jalankan inisialisasi
 init();
+
