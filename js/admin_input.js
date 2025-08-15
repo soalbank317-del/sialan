@@ -1,7 +1,30 @@
 // ==========================
+// === Overlay / Loader ===
+// ==========================
+const overlay = document.createElement('div');
+overlay.id = 'overlay';
+Object.assign(overlay.style, {
+  position: 'fixed',
+  top: '0',
+  left: '0',
+  width: '100%',
+  height: '100%',
+  background: 'rgba(255,255,255,0.9)',
+  zIndex: '9999',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center'
+});
+overlay.innerHTML = `
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+`;
+document.body.prepend(overlay);
+
+// ==========================
 // === Proteksi Login ===
 // ==========================
-// Mengecek apakah user sudah login. Jika belum, redirect ke login
 const user = sessionStorage.getItem('user');
 if(!user){
   overlay.remove();
@@ -12,7 +35,6 @@ if(!user){
 // ==========================
 // === Logout Handler ===
 // ==========================
-// Menghapus session user saat tombol logout diklik
 document.getElementById('logoutBtn')?.addEventListener('click', e=>{
   e.preventDefault();
   sessionStorage.removeItem('user');
@@ -32,79 +54,63 @@ const urls = {
 // ==========================
 // === Endpoint Apps Script ===
 // ==========================
-// URL Web App Apps Script untuk menyimpan data ke spreadsheet tujuan
 const saveEndpoint = "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec";
 
 // ==========================
-// === Fungsi fetchCSV ===
+// === Fungsi fetchCSV dengan validasi ===
 // ==========================
-// Mengambil CSV dari URL, parsing menggunakan PapaParse, mengembalikan array kolom tertentu
 async function fetchCSV(url, columnIndexStart = 0) {
-  const res = await fetch(url);
-  const text = await res.text();
-  return Papa.parse(text.trim(), { header: false }).data.map(r => r[columnIndexStart]);
+  try {
+    const res = await fetch(url);
+    const text = await res.text();
+    // Cek apakah response bukan CSV
+    if(text.startsWith("<!DOCTYPE html>") || text.includes("Halaman Tidak Ditemukan")){
+      throw new Error("CSV tidak tersedia / URL salah");
+    }
+    return Papa.parse(text.trim(), { header: false }).data.map(r => r[columnIndexStart]);
+  } catch(err){
+    console.error("Gagal fetch CSV:", url, err);
+    alert(`Gagal mengambil data dari ${url}. Pastikan sheet sudah di-publish ke web!`);
+    return [];
+  }
 }
 
 // ==========================
 // === Inisialisasi Dropdown ===
 // ==========================
-// Mengisi dropdown Wali Kelas, Mata Pelajaran, dan Kelas otomatis dari CSV
 async function initDropdowns() {
-  const waliData = await fetchCSV(urls.waliKelas, 0); // kolom A
-  const mapelData = await fetchCSV(urls.mapel, 0);     // kolom A
-  const kelasData = await fetchCSV(urls.kelas, 1);     // kolom B
+  const waliData = await fetchCSV(urls.waliKelas, 0);
+  const mapelData = await fetchCSV(urls.mapel, 0);
+  const kelasData = await fetchCSV(urls.kelas, 1);
 
-  // Dropdown Wali Kelas
-  const waliSelect = document.getElementById("waliKelas");
-  waliSelect.innerHTML = '<option value="">Pilih Wali Kelas</option>';
-  waliData.forEach(wk => { 
-    if(wk) { 
-      const opt = document.createElement("option"); 
-      opt.value = wk; 
-      opt.textContent = wk; 
-      waliSelect.appendChild(opt); 
-    } 
-  });
+  const fillDropdown = (selectId, data, placeholder) => {
+    const select = document.getElementById(selectId);
+    select.innerHTML = `<option value="">${placeholder}</option>`;
+    data.forEach(d=>{
+      if(d){
+        const opt = document.createElement("option");
+        opt.value = d;
+        opt.textContent = d;
+        select.appendChild(opt);
+      }
+    });
+  };
 
-  // Dropdown Mata Pelajaran
-  const mapelSelect = document.getElementById("mapel");
-  mapelSelect.innerHTML = '<option value="">Pilih Mata Pelajaran</option>';
-  mapelData.forEach(mp => { 
-    if(mp) { 
-      const opt = document.createElement("option"); 
-      opt.value = mp; 
-      opt.textContent = mp; 
-      mapelSelect.appendChild(opt); 
-    } 
-  });
-
-  // Dropdown Kelas
-  const kelasSelect = document.getElementById("kelas");
-  kelasSelect.innerHTML = '<option value="">Pilih Kelas</option>';
-  kelasData.forEach(k => { 
-    if(k) { 
-      const opt = document.createElement("option"); 
-      opt.value = k; 
-      opt.textContent = k; 
-      kelasSelect.appendChild(opt); 
-    } 
-  });
+  fillDropdown("waliKelas", waliData, "Pilih Wali Kelas");
+  fillDropdown("mapel", mapelData, "Pilih Mata Pelajaran");
+  fillDropdown("kelas", kelasData, "Pilih Kelas");
 }
 
 // ==========================
 // === Fetch Siswa Per Kelas ===
 // ==========================
-// Mengambil daftar siswa dari CSV dan mengelompokkannya menurut kelas
 async function fetchSiswa() {
-  const res = await fetch(urls.siswa);
-  const text = await res.text();
-  const data = Papa.parse(text.trim(), { header: false }).data;
-
-  const siswaObj = {}; // {kelas: [namaSiswa]}
-  data.forEach(r => {
-    const kelas = r[0]?.trim(); // kolom A
-    const nama = r[1]?.trim();  // kolom B
-    if(kelas && nama) {
+  const res = await fetchCSV(urls.siswa);
+  const siswaObj = {};
+  res.forEach(r=>{
+    const kelas = r[0]?.trim();
+    const nama = r[1]?.trim();
+    if(kelas && nama){
       if(!siswaObj[kelas]) siswaObj[kelas] = [];
       siswaObj[kelas].push(nama);
     }
@@ -115,17 +121,15 @@ async function fetchSiswa() {
 // ==========================
 // === Event Pilih Kelas ===
 // ==========================
-// Menampilkan daftar siswa di tabel saat user memilih kelas
 async function initSiswaTable() {
   const siswaData = await fetchSiswa();
   const kelasSelect = document.getElementById("kelas");
   const tbody = document.querySelector("#siswaTable tbody");
 
   kelasSelect.addEventListener("change", () => {
-    const selectedKelas = kelasSelect.value;
-    tbody.innerHTML = ""; // bersihkan tabel
-    const list = siswaData[selectedKelas] || [];
-    list.forEach(siswa => {
+    tbody.innerHTML = "";
+    const list = siswaData[kelasSelect.value] || [];
+    list.forEach(siswa=>{
       const row = document.createElement("tr");
       row.innerHTML = `<td>${siswa}</td>
         <td>
@@ -143,16 +147,14 @@ async function initSiswaTable() {
 // ==========================
 // === Submit Form ===
 // ==========================
-// Mengumpulkan data dari form dan tabel siswa, kirim ke Apps Script
-document.getElementById("inputForm").addEventListener("submit", async (e) => {
+document.getElementById("inputForm").addEventListener("submit", async (e)=>{
   e.preventDefault();
-
   const rows = document.querySelectorAll("#siswaTable tbody tr");
   const siswaData = [];
-  rows.forEach(row => {
-    siswaData.push({ 
-      nama: row.cells[0].textContent, 
-      status: row.cells[1].querySelector("select").value 
+  rows.forEach(row=>{
+    siswaData.push({
+      nama: row.cells[0].textContent,
+      status: row.cells[1].querySelector("select").value
     });
   });
 
@@ -164,7 +166,7 @@ document.getElementById("inputForm").addEventListener("submit", async (e) => {
     siswa: siswaData
   };
 
-  try {
+  try{
     const res = await fetch(saveEndpoint, {
       method: "POST",
       body: JSON.stringify(formData),
@@ -172,7 +174,7 @@ document.getElementById("inputForm").addEventListener("submit", async (e) => {
     });
     const result = await res.json();
     alert(result.message || "Data berhasil disimpan!");
-  } catch(err) {
+  } catch(err){
     console.error(err);
     alert("Gagal menyimpan data ke spreadsheet.");
   }
@@ -183,6 +185,4 @@ document.getElementById("inputForm").addEventListener("submit", async (e) => {
 // ==========================
 initDropdowns();
 initSiswaTable();
-
-// Hapus overlay loading setelah halaman siap
 overlay.remove();
