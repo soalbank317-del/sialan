@@ -44,7 +44,7 @@ document.getElementById('logoutBtn')?.addEventListener('click', e => {
 // ==========================
 // === Rekap Data & Modal Edit ===
 if (document.getElementById('rekapTable')) {
-  const webAppUrl = "https://script.google.com/macros/s/AKfycbw9ZL7P-tNwXP6qZUiQCU3KJmorL429a9of8Hm_Si962P8NLCyro9Uq7BRqqulkie3M/exec";
+  const webAppUrl = "https://script.google.com/macros/s/AKfycbwv7x7eHXHQDjFQcylMbwVuFitikFfAEsm8ARwa9gibE1RKinQpwfTSSHMe3Eqr0gWH/exec";
 
   let allData = [], filteredData = [], currentPage = 1, rowsPerPage = 15;
   let selectedRowIndex = null;
@@ -238,3 +238,4 @@ if (document.getElementById('rekapTable')) {
 
   initRekap();
 }
+
