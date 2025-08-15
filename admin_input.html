@@ -15,7 +15,7 @@
     <a class="navbar-brand fw-bold" href="#">SIALAN – Admin Panel</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarAdminMenu">
       <span class="navbar-toggler-icon"></span>
-    </button
+    </button>
     <div class="collapse navbar-collapse" id="navbarAdminMenu">
       <ul class="navbar-nav ms-auto">
         <li class="nav-item">
@@ -34,71 +34,153 @@
 
 <section class="container my-4">
   <div class="card">
-    <h3 class="mb-3">Input Data KBM</h3>
+    <div class="card-body">
+      <h3 class="mb-3">Input Data KBM</h3>
 
-<form id="inputForm">
-      <!-- Tanggal -->
-      <div class="mb-3">
-        <label for="tanggal" class="form-label">Tanggal</label>
-        <input type="date" id="tanggal" class="form-control" required>
-      </div>
+      <form id="inputForm">
+        <!-- Tanggal -->
+        <div class="mb-3">
+          <label for="tanggal" class="form-label">Tanggal</label>
+          <input type="date" id="tanggal" class="form-control" required>
+        </div>
 
-      <!-- Wali Kelas -->
-      <div class="mb-3">
-        <label for="waliKelas" class="form-label">Wali Kelas</label>
-        <select id="waliKelas" class="form-select" required>
-          <option value="">Memuat data...</option>
-        </select>
-      </div>
+        <!-- Wali Kelas -->
+        <div class="mb-3">
+          <label for="waliKelas" class="form-label">Wali Kelas</label>
+          <select id="waliKelas" class="form-select" required>
+            <option value="">Memuat data...</option>
+          </select>
+        </div>
 
-      <!-- Mata Pelajaran -->
-      <div class="mb-3">
-        <label for="mapel" class="form-label">Mata Pelajaran</label>
-        <select id="mapel" class="form-select" required>
-          <option value="">Memuat data...</option>
-        </select>
-      </div>
+        <!-- Mata Pelajaran -->
+        <div class="mb-3">
+          <label for="mapel" class="form-label">Mata Pelajaran</label>
+          <select id="mapel" class="form-select" required>
+            <option value="">Memuat data...</option>
+          </select>
+        </div>
 
-      <!-- Kelas -->
-      <div class="mb-3">
-        <label for="kelas" class="form-label">Kelas</label>
-        <select id="kelas" class="form-select" required>
-          <option value="">Memuat data...</option>
-        </select>
-      </div>
+        <!-- Kelas (untuk menentukan daftar siswa) -->
+        <div class="mb-3">
+          <label for="kelas" class="form-label">Kelas</label>
+          <select id="kelas" class="form-select" required>
+            <option value="">Memuat data...</option>
+          </select>
+        </div>
 
-      <!-- Nama Siswa -->
-      <div class="mb-3">
-        <label for="namaSiswa" class="form-label">Nama Siswa</label>
-        <select id="namaSiswa" class="form-select" required>
-          <option value="">Memuat data...</option>
-        </select>
-      </div>
+        <!-- Tabel Siswa & Status -->
+        <div class="mb-3">
+          <label class="form-label">Daftar Siswa & Status</label>
+          <table class="table table-bordered" id="siswaTable">
+            <thead>
+              <tr>
+                <th>Nama Siswa</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Baris siswa muncul di sini setelah pilih kelas -->
+            </tbody>
+          </table>
+        </div>
 
-      <!-- Status -->
-      <div class="mb-3">
-        <label for="status" class="form-label">Status</label>
-        <select id="status" class="form-select" required>
-          <option value="">Pilih Status</option>
-          <option value="Tuntas">Tuntas</option>
-          <option value="Ujian">Ujian</option>
-        </select>
-      </div>
+        <button type="submit" class="btn btn-primary">Simpan</button>
+      </form>
 
-      <button type="submit" class="btn btn-primary">Simpan</button>
-    </form>
+    </div>
   </div>
 </section>
 
-<footer>
+<footer class="text-center py-3">
   © 2025 SIALAN – Sistem Analisis Laporan KBM Siswa
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="js/admin_input.js"></script>
+
+<script>
+// Simulasi data dari spreadsheet
+const data = {
+  waliKelas: ["Pak Ahmad", "Bu Siti"],
+  mapel: ["Matematika", "IPA", "IPS"],
+  kelas: ["7A", "7B"],
+  siswa: {
+    "7A": ["Ahmad", "Siti", "Budi"],
+    "7B": ["Rina", "Tono", "Dewi"]
+  }
+};
+
+// Isi dropdown Wali Kelas
+const waliSelect = document.getElementById("waliKelas");
+data.waliKelas.forEach(wk => {
+  const opt = document.createElement("option");
+  opt.value = wk;
+  opt.textContent = wk;
+  waliSelect.appendChild(opt);
+});
+
+// Isi dropdown Mapel
+const mapelSelect = document.getElementById("mapel");
+data.mapel.forEach(mp => {
+  const opt = document.createElement("option");
+  opt.value = mp;
+  opt.textContent = mp;
+  mapelSelect.appendChild(opt);
+});
+
+// Isi dropdown Kelas
+const kelasSelect = document.getElementById("kelas");
+data.kelas.forEach(k => {
+  const opt = document.createElement("option");
+  opt.value = k;
+  opt.textContent = k;
+  kelasSelect.appendChild(opt);
+});
+
+// Event pilih kelas untuk menampilkan daftar siswa
+kelasSelect.addEventListener("change", () => {
+  const selectedKelas = kelasSelect.value;
+  const siswaTableBody = document.querySelector("#siswaTable tbody");
+  siswaTableBody.innerHTML = ""; // Kosongkan tabel
+
+  const siswaList = data.siswa[selectedKelas] || [];
+  siswaList.forEach(siswa => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${siswa}</td>
+      <td>
+        <select class="form-select" required>
+          <option value="">Pilih Status</option>
+          <option value="Tuntas">Tuntas</option>
+          <option value="Ujian">Ujian</option>
+        </select>
+      </td>
+    `;
+    siswaTableBody.appendChild(row);
+  });
+});
+
+// Event submit form
+document.getElementById("inputForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const rows = document.querySelectorAll("#siswaTable tbody tr");
+  const siswaData = [];
+  rows.forEach(row => {
+    const nama = row.cells[0].textContent;
+    const status = row.cells[1].querySelector("select").value;
+    siswaData.push({ nama, status });
+  });
+
+  console.log({
+    tanggal: document.getElementById("tanggal").value,
+    waliKelas: document.getElementById("waliKelas").value,
+    mapel: document.getElementById("mapel").value,
+    kelas: document.getElementById("kelas").value,
+    siswa: siswaData
+  });
+
+  alert("Data berhasil dicatat! Cek console untuk detail.");
+});
+</script>
+
 </body>
 </html>
-
-
-
-
