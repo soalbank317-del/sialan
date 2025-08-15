@@ -43,10 +43,11 @@ document.getElementById('logoutBtn')?.addEventListener('click', e => {
 
 // ==========================
 // === Rekap Data & Modal Edit ===
-// ==========================
 if (document.getElementById('rekapTable')) {
+  const webAppUrl = "https://script.google.com/macros/s/AKfycbw9ZL7P-tNwXP6qZUiQCU3KJmorL429a9of8Hm_Si962P8NLCyro9Uq7BRqqulkie3M/exec";
+
   let allData = [], filteredData = [], currentPage = 1, rowsPerPage = 15;
-  let selectedRowIndex = null; // Untuk menyimpan indeks data yang sedang diedit
+  let selectedRowIndex = null;
 
   // ===== Fungsi parsing tanggal Indonesia menjadi Date =====
   function parseIndoDateTime(dateStr) {
@@ -55,7 +56,7 @@ if (document.getElementById('rekapTable')) {
     const [day, month, year] = datePart.split("/").map(Number);
     let hours = 0, minutes = 0, seconds = 0;
     if (timePart) [hours, minutes, seconds] = timePart.split(":").map(Number);
-    return new Date(year, month - 1, day, hours, minutes, seconds);
+    return new Date(year, month-1, day, hours, minutes, seconds);
   }
 
   // ===== Fungsi sort data terbaru =====
@@ -63,21 +64,11 @@ if (document.getElementById('rekapTable')) {
     return data.sort((a,b) => parseIndoDateTime(b.Tanggal) - parseIndoDateTime(a.Tanggal));
   }
 
-  // ===== Fungsi load data CSV dari Google Sheets =====
+  // ===== Fungsi load data dari Web App Google Apps Script =====
   async function loadRekapData() {
-    const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQAEwBLEhaehGYlzYsNhBPfmozGvRZmpjyEOHC8rfgduB0JRurz-xwI_jfW8Fw8Vaz93a_E9tLyuIX9/pub?gid=0&single=true&output=csv";
-    const res = await fetch(url);
-    const csvText = await res.text();
-
-    const rows = csvText.split(/\r?\n/).filter(Boolean)
-      .map(r => r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/));
-
-    const headers = rows[0].map(h => h.trim().replace(/\s+/g, "_"));
-    return rows.slice(1).map(vals => {
-      const obj = {};
-      headers.forEach((h,i) => obj[h] = (vals[i] || "").replace(/^"|"$/g,'').trim());
-      return obj;
-    });
+    const res = await fetch(webAppUrl);
+    const data = await res.json(); // Web App harus return JSON dari getRekapData()
+    return data;
   }
 
   // ===== Update total data yang difilter =====
@@ -86,7 +77,7 @@ if (document.getElementById('rekapTable')) {
     if (totalEl) totalEl.textContent = `Total Data: ${filteredData.length}`;
   }
 
-  // ===== Render tabel berdasarkan halaman =====
+  // ===== Render tabel =====
   function renderTablePage(page) {
     const tbody = document.querySelector('#rekapTable tbody');
     tbody.innerHTML = '';
@@ -108,7 +99,7 @@ if (document.getElementById('rekapTable')) {
       `;
     });
 
-    if(filteredData.length === 0) {
+    if(filteredData.length===0){
       tbody.innerHTML = '<tr><td colspan="7" class="text-center">Data tidak tersedia</td></tr>';
     }
 
@@ -116,7 +107,6 @@ if (document.getElementById('rekapTable')) {
     document.getElementById('totalPages').textContent = Math.ceil(filteredData.length/rowsPerPage);
     updateTotalFiltered();
 
-    // Tambahkan event listener untuk tombol Edit
     document.querySelectorAll('.editBtn').forEach(btn => {
       btn.addEventListener('click', e => {
         selectedRowIndex = parseInt(e.target.dataset.index);
@@ -140,27 +130,35 @@ if (document.getElementById('rekapTable')) {
   }
 
   // ===== Form submit edit data =====
-  document.getElementById('editForm').addEventListener('submit', function(e){
+  document.getElementById('editForm').addEventListener('submit', async function(e){
     e.preventDefault();
-    if(selectedRowIndex === null) return;
+    if(selectedRowIndex===null) return;
 
-    // Update data di filteredData
-    filteredData[selectedRowIndex].Tanggal = document.getElementById('editTanggal').value;
-    filteredData[selectedRowIndex].Wali_Kelas = document.getElementById('editWali').value;
-    filteredData[selectedRowIndex].Mata_Pelajaran = document.getElementById('editMapel').value;
-    filteredData[selectedRowIndex].Kelas = document.getElementById('editKelas').value;
-    filteredData[selectedRowIndex].Nama_Siswa = document.getElementById('editNama').value;
-    filteredData[selectedRowIndex].Status = document.getElementById('editStatus').value;
+    const updated = {
+      Tanggal: document.getElementById('editTanggal').value,
+      Wali_Kelas: document.getElementById('editWali').value,
+      Mata_Pelajaran: document.getElementById('editMapel').value,
+      Kelas: document.getElementById('editKelas').value,
+      Nama_Siswa: document.getElementById('editNama').value,
+      Status: document.getElementById('editStatus').value
+    };
 
-    // Render ulang tabel halaman saat ini
+    // Update filteredData
+    filteredData[selectedRowIndex] = updated;
+
+    // Render ulang tabel
     renderTablePage(currentPage);
 
-    // Tutup modal Bootstrap
+    // Tutup modal
     const modalEl = document.getElementById('editModal');
     bootstrap.Modal.getInstance(modalEl).hide();
 
-    // TODO: Kirim data ke Google Apps Script untuk update sheet
-    console.log("Data yang diedit:", filteredData[selectedRowIndex]);
+    // Kirim ke Web App untuk update Sheet
+    await fetch(webAppUrl, {
+      method: "POST",
+      body: JSON.stringify({updatedData: updated, rowIndex: selectedRowIndex}),
+      headers: {"Content-Type": "application/json"}
+    });
   });
 
   // ===== Filter data =====
@@ -171,9 +169,9 @@ if (document.getElementById('rekapTable')) {
     const search = document.getElementById('searchNama').value.toLowerCase();
 
     filteredData = allData.filter(d =>
-      (!kelas || d.Kelas === kelas) &&
-      (!mapel || d.Mata_Pelajaran === mapel) &&
-      (!status || d.Status === status) &&
+      (!kelas || d.Kelas===kelas) &&
+      (!mapel || d.Mata_Pelajaran===mapel) &&
+      (!status || d.Status===status) &&
       (!search || (d.Nama_Siswa||'').toLowerCase().includes(search))
     );
 
@@ -212,7 +210,7 @@ if (document.getElementById('rekapTable')) {
       renderTablePage(currentPage);
     });
 
-    // Event listener pagination
+    // Pagination
     document.getElementById('rowsPerPage').addEventListener('change', e=>{
       rowsPerPage = parseInt(e.target.value);
       currentPage = 1;
