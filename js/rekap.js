@@ -1,36 +1,60 @@
+// ===========================================
 // Variabel Global
+// ===========================================
+// Menyimpan seluruh data, data hasil filter, halaman saat ini, dan jumlah baris per halaman
 let allData = [], filteredData = [], currentPage = 1, rowsPerPage = 15;
 
-// Parsing Tanggal Indonesia
+// ===========================================
+// Fungsi: parseIndoDateTime
+// ===========================================
+// Tujuan: Mengubah string tanggal dari format Indonesia "dd/mm/yyyy hh:mm:ss" menjadi objek Date JS
+// Input: "25/08/2025 14:30:00" atau "25/08/2025"
+// Output: objek Date
 function parseIndoDateTime(dateStr) {
-  const [datePart, timePart] = dateStr.split(" ");
-  if (!datePart) return new Date(dateStr);
+  const [datePart, timePart] = dateStr.split(" "); // pisahkan tanggal dan waktu
+  if (!datePart) return new Date(dateStr); // fallback jika format tidak sesuai
   const [day, month, year] = datePart.split("/").map(Number);
   let hours = 0, minutes = 0, seconds = 0;
   if (timePart) [hours, minutes, seconds] = timePart.split(":").map(Number);
-  return new Date(year, month-1, day, hours, minutes, seconds);
+  return new Date(year, month-1, day, hours, minutes, seconds); // bulan di JS 0-based
 }
 
+// ===========================================
+// Fungsi: sortByLatestDate
+// ===========================================
+// Tujuan: Mengurutkan data berdasarkan tanggal terbaru
+// Input: array data
+// Output: array data terurut dari terbaru ke terlama
 function sortByLatestDate(data) {
   return data.sort((a,b) => parseIndoDateTime(b.Tanggal) - parseIndoDateTime(a.Tanggal));
 }
 
-// Load Data CSV
+// ===========================================
+// Fungsi: loadRekapData
+// ===========================================
+// Tujuan: Memuat data dari Google Sheets CSV
+// Catatan: Sheet dipublikasikan sebagai CSV dengan tab sebagai pemisah
+// Output: array objek {Tanggal, Wali_Kelas, Mata_Pelajaran, Kelas, Nama_Siswa, Status}
 async function loadRekapData() {
   const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQAEwBLEhaehGYlzYsNhBPfmozGvRZmpjyEOHC8rfgduB0JRurz-xwI_jfW8Fw8Vaz93a_E9tLyuIX9/pub?gid=0&single=true&output=csv";
   const res = await fetch(url);
   const csvText = await res.text();
-  const lines = csvText.split("\n").filter(l => l.trim() !== "");
-  const headers = lines[0].split(",").map(h => h.trim().replace(/\s+/g, "_"));
+  const lines = csvText.split("\n").filter(l => l.trim() !== ""); // hapus baris kosong
+  // Gunakan tab sebagai pemisah karena CSV dipisahkan tab
+  const headers = lines[0].split("\t").map(h => h.trim().replace(/\s+/g, "_")); 
   return lines.slice(1).map(line => {
-    const vals = line.split(",");
+    const vals = line.split("\t"); // pisahkan tiap kolom
     const obj = {};
-    headers.forEach((h,i)=> obj[h] = (vals[i]||"").trim());
+    headers.forEach((h,i)=> obj[h] = (vals[i]||"").trim()); // mapping header → value
     return obj;
   });
 }
 
-// Render Halaman Tabel
+// ===========================================
+// Fungsi: renderTablePage
+// ===========================================
+// Tujuan: Menampilkan tabel sesuai halaman saat ini
+// Input: nomor halaman
 function renderTablePage(page){
   const tbody = document.querySelector('#rekapTable tbody');
   tbody.innerHTML = '';
@@ -51,11 +75,16 @@ function renderTablePage(page){
   if(filteredData.length === 0){
     tbody.innerHTML = '<tr><td colspan="6" class="text-center">Data tidak tersedia</td></tr>';
   }
+  // Update indikator halaman
   document.getElementById('pageNum').textContent = currentPage;
   document.getElementById('totalPages').textContent = Math.ceil(filteredData.length/rowsPerPage);
 }
 
-// Terapkan Filter
+// ===========================================
+// Fungsi: applyFilters
+// ===========================================
+// Tujuan: Menerapkan filter kelas, mapel, status, dan pencarian nama siswa
+// Output: memperbarui filteredData dan menampilkan tabel
 function applyFilters(){
   const kelas = document.getElementById('filterKelas').value;
   const mapel = document.getElementById('filterMapel').value;
@@ -74,13 +103,16 @@ function applyFilters(){
   renderTablePage(currentPage);
 }
 
-// Inisialisasi
+// ===========================================
+// Fungsi: init
+// ===========================================
+// Tujuan: Inisialisasi halaman, load data, populate filter, dan event listener
 async function init(){
-  allData = await loadRekapData();
+  allData = await loadRekapData(); // load CSV
   allData = sortByLatestDate(allData);
   filteredData = [...allData];
 
-  // Populate filter options
+  // Populate filter Kelas dan Mapel
   const kelasSet = new Set(allData.map(d=>d.Kelas).filter(Boolean));
   const mapelSet = new Set(allData.map(d=>d.Mata_Pelajaran).filter(Boolean));
 
@@ -89,7 +121,7 @@ async function init(){
 
   renderTablePage(currentPage);
 
-  // Event Listener
+  // Event Listener untuk filter, reset, pagination, dan rows per page
   document.getElementById('applyFilter').addEventListener('click', applyFilters);
   document.getElementById('resetFilter').addEventListener('click', ()=>{
     document.getElementById('filterKelas').value = '';
@@ -113,4 +145,5 @@ async function init(){
   });
 }
 
+// Jalankan inisialisasi saat halaman load
 init();
