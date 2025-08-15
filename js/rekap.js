@@ -34,7 +34,7 @@ async function loadRekapData() {
   const lines = csvText.split("\n").filter(l => l.trim() !== "");
   const headers = lines[0].split(";").map(h => h.trim().replace(/\s+/g, "_"));
   return lines.slice(1).map(line => {
-    const vals = line.split(";");
+    const vals = line.split(",");
     const obj = {};
     headers.forEach((h,i)=> obj[h] = (vals[i]||"").trim());
     return obj;
@@ -140,3 +140,4 @@ async function init(){
 
 // Jalankan inisialisasi
 init();
+
