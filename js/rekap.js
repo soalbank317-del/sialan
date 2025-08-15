@@ -78,7 +78,7 @@ function renderTablePage(page){
 // ===========================================
 function applyFilters(){
   const kelas = document.getElementById('filterKelas').value;
-  const matapelajaran = document.getElementById('filtermatapelajaran').value;
+  const matapelajaran = document.getElementById('filterMatapelajaran').value;
   const status = document.getElementById('filterStatus').value;
   const search = document.getElementById('searchNama').value.toLowerCase();
 
@@ -138,4 +138,5 @@ async function init(){
 
 // Jalankan inisialisasi
 init();
+
 
