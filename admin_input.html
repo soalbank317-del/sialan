@@ -1,50 +1,98 @@
-<form id="inputForm">
-  <div class="mb-3">
-    <label for="tanggal" class="form-label">Tanggal</label>
-    <input type="date" id="tanggal" class="form-control" required>
-  </div>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIALAN – Input Data KBM</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet">
+</head>
+<body>
 
-  <div class="mb-3">
-    <label for="waliKelas" class="form-label">Wali Kelas</label>
-    <select id="waliKelas" class="form-select" required>
-      <option value="">-Pilih dulu-</option>
-    </select>
+<!-- Navbar Admin -->
+<nav class="navbar navbar-expand-lg shadow-sm">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="#">SIALAN – Admin Panel</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarAdminMenu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarAdminMenu">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link active" href="admin_input.html">Input Data KBM</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="admin_rekap.html">Rekap KBM</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" id="logoutBtn">Logout</a>
+        </li>
+      </ul>
+    </div>
   </div>
+</nav>
 
-  <div class="mb-3">
-    <label for="mapel" class="form-label">Mata Pelajaran</label>
-    <select id="mapel" class="form-select" required>
-      <option value="">-Pilih dulu-</option>
-    </select>
+<section class="container my-4">
+  <div class="card">
+    <div class="card-body">
+      <h3 class="mb-3">Input Data KBM</h3>
+
+      <form id="inputForm">
+        <div class="mb-3">
+          <label for="tanggal" class="form-label">Tanggal</label>
+          <input type="date" id="tanggal" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+          <label for="waliKelas" class="form-label">Wali Kelas</label>
+          <select id="waliKelas" class="form-select" required>
+            <option value="">-Pilih dulu-</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label for="mapel" class="form-label">Mata Pelajaran</label>
+          <select id="mapel" class="form-select" required>
+            <option value="">-Pilih dulu-</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label for="kelas" class="form-label">Kelas</label>
+          <select id="kelas" class="form-select" required>
+            <option value="">-Pilih dulu-</option>
+          </select>
+        </div>
+
+        <!-- Tombol Pilih Semua Status -->
+        <div class="mb-3">
+          <button type="button" id="tuntasAll" class="btn btn-success me-2">Tuntas Semua</button>
+          <button type="button" id="ujianAll" class="btn btn-warning">Ujian Semua</button>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Daftar Siswa & Status</label>
+          <table class="table table-bordered" id="siswaTable">
+            <thead>
+              <tr><th>Nama Siswa</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+              <!-- Baris siswa akan di-generate via JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Simpan</button>
+      </form>
+
+    </div>
   </div>
+</section>
 
-  <div class="mb-3">
-    <label for="kelas" class="form-label">Kelas</label>
-    <select id="kelas" class="form-select" required>
-      <option value="">-Pilih dulu-</option>
-    </select>
-  </div>
+<footer class="text-center py-3">© 2025 SIALAN – Sistem Analisis Laporan KBM Siswa</footer>
 
-  <!-- Tombol Pilih Semua Status -->
-  <div class="mb-3">
-    <button type="button" id="tuntasAll" class="btn btn-success me-2">Tuntas Semua</button>
-    <button type="button" id="ujianAll" class="btn btn-warning">Ujian Semua</button>
-  </div>
-
-  <div class="mb-3">
-    <label class="form-label">Daftar Siswa & Status</label>
-    <table class="table table-bordered" id="siswaTable">
-      <thead>
-        <tr>
-          <th>Nama Siswa</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Baris siswa akan di-generate via JS -->
-      </tbody>
-    </table>
-  </div>
-
-  <button type="submit" class="btn btn-primary">Simpan</button>
-</form>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="js/admin_input.js"></script>
+</body>
+</html>
