@@ -7,10 +7,10 @@ let allData = [], filteredData = [], currentPage = 1, rowsPerPage = 15;
 // Fungsi: parseIndoDateTime
 // ===========================================
 function parseIndoDateTime(dateStr) {
-  if (!dateStr) return new Date();
   const [datePart, timePart] = dateStr.split(" ");
+  if (!datePart) return new Date(dateStr);
   const [day, month, year] = datePart.split("/").map(Number);
-  let hours = 0, minutes = 0, seconds = 0;
+  let hours=0, minutes=0, seconds=0;
   if (timePart) [hours, minutes, seconds] = timePart.split(":").map(Number);
   return new Date(year, month-1, day, hours, minutes, seconds);
 }
@@ -47,6 +47,7 @@ function renderTablePage(page){
   tbody.innerHTML = '';
   const start = (page-1)*rowsPerPage;
   const end = start + rowsPerPage;
+
   filteredData.slice(start,end).forEach(row => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
@@ -59,11 +60,17 @@ function renderTablePage(page){
     `;
     tbody.appendChild(tr);
   });
+
   if(filteredData.length === 0){
     tbody.innerHTML = '<tr><td colspan="6" class="text-center">Data tidak tersedia</td></tr>';
   }
+
+  // Update indikator halaman
   document.getElementById('pageNum').textContent = currentPage;
   document.getElementById('totalPages').textContent = Math.ceil(filteredData.length/rowsPerPage);
+
+  // Tambahkan jumlah data yang ditemukan
+  document.getElementById('totalFiltered').textContent = `Jumlah Data Ditemukan: ${filteredData.length}`;
 }
 
 // ===========================================
@@ -95,7 +102,7 @@ async function init(){
   allData = sortByLatestDate(allData);
   filteredData = [...allData];
 
-  // Populate filter dropdowns
+  // Populate filter options
   const kelasSet = new Set(allData.map(d=>d.Kelas).filter(Boolean));
   const mapelSet = new Set(allData.map(d=>d.Mata_Pelajaran).filter(Boolean));
   kelasSet.forEach(k => document.getElementById('filterKelas').innerHTML += `<option value="${k}">${k}</option>`);
@@ -114,11 +121,13 @@ async function init(){
     currentPage = 1;
     renderTablePage(currentPage);
   });
-  document.getElementById('rowsPerPage').addEventListener('change', e=>{
+
+  document.getElementById('rowsPerPage').addEventListener('change', e => {
     rowsPerPage = parseInt(e.target.value);
     currentPage = 1;
     renderTablePage(currentPage);
   });
+
   document.getElementById('prevPage').addEventListener('click', ()=>{
     if(currentPage>1){ currentPage--; renderTablePage(currentPage);}
   });
@@ -127,5 +136,5 @@ async function init(){
   });
 }
 
-// Jalankan init saat halaman load
+// Jalankan inisialisasi
 init();
