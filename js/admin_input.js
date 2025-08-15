@@ -54,7 +54,7 @@ const urls = {
 // ==========================
 // === Endpoint Apps Script ===
 // ==========================
-const saveEndpoint = "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec";
+const saveEndpoint = "https://script.google.com/macros/s/AKfycbwv7x7eHXHQDjFQcylMbwVuFitikFfAEsm8ARwa9gibE1RKinQpwfTSSHMe3Eqr0gWH/exec";
 
 // ==========================
 // === Fungsi fetchCSV dengan validasi ===
@@ -208,3 +208,4 @@ initDropdowns()
   .then(()=>initSiswaTable())
   .then(()=>attachSelectAllButtons())
   .finally(()=>overlay.remove());
+
