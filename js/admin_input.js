@@ -98,7 +98,7 @@ async function initDropdowns() {
 
   fillDropdown("waliKelas", waliData, "Pilih Wali Kelas");
   fillDropdown("matapelajaran", mapelData, "Pilih Mata Pelajaran");
-  fillDropdown("kelas", kelasData, "Pilih Kelas", 1);
+  fillDropdown("kelas", kelasData, "Pilih Kelas", 0);
 }
 
 // ==========================
@@ -203,3 +203,4 @@ initDropdowns()
   .then(()=>initSiswaTable())
   .then(()=>attachSelectAllButtons())
   .finally(()=>overlay.remove());
+
