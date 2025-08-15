@@ -1,0 +1,55 @@
+/* --- Umum --- */
+body {
+    font-family: "Inter", sans-serif;
+    background-color: #f8f9fa;
+    color: #2c3e50;
+}
+
+/* Footer */
+footer {
+    display: flex;
+    justify-content: center; /* horizontal center */
+    align-items: center;     /* vertical center */
+    width: 100%;
+    padding: 20px 0;
+    font-size: 0.9rem;
+    color: #6c757d;
+    border-top: 1px solid #e9ecef;
+    background: linear-gradient(90deg,#ffffff,#f8f8f8);
+    box-shadow: 0 -2px 6px rgba(0,0,0,0.04);
+}
+
+/* Card umum */
+.card {
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    padding: 20px;
+}
+
+/* Tabel */
+.table-hover tbody tr:hover {
+    background-color: #f1f3f5;
+}
+
+/* Navbar */
+.navbar-brand {
+    font-weight: 700;
+}
+
+.nav-link.active {
+    font-weight: 600;
+}
+
+/* Form input/filter */
+.form-select-sm, .form-control-sm {
+    font-size: 0.875rem;
+}
+
+/* Overlay & Toast */
+#overlayBlur {
+    backdrop-filter: blur(4px);
+    z-index: 1999;
+}
+#toastWrapper {
+    z-index: 2000;
+}

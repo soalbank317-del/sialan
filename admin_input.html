@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIALAN – Input Data KBM</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="style.css" rel="stylesheet">
+</head>
+<body>
+
+<!-- Navbar Admin -->
+<nav class="navbar navbar-expand-lg shadow-sm">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="#">SIALAN – Admin Panel</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarAdminMenu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarAdminMenu">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="admin_input.html">Input Data KBM</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="admin_rekap.html">Rekap KBM</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="login.html" id="logoutBtn">Logout</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<section class="container my-4">
+  <div class="card">
+    <h3 class="mb-3">Input Data KBM</h3>
+
+    <form id="inputForm">
+      <div class="mb-3">
+        <label for="tanggal" class="form-label">Tanggal</label>
+        <input type="date" id="tanggal" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label for="mapel" class="form-label">Mata Pelajaran</label>
+        <input type="text" id="mapel" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label for="kelas" class="form-label">Kelas</label>
+        <input type="text" id="kelas" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label for="namaSiswa" class="form-label">Nama Siswa</label>
+        <input type="text" id="namaSiswa" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label for="status" class="form-label">Status</label>
+        <select id="status" class="form-select" required>
+          <option value="">Pilih Status</option>
+          <option value="Tuntas">Tuntas</option>
+          <option value="Ujian">Ujian</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary">Simpan</button>
+    </form>
+  </div>
+</section>
+
+<footer>
+  © 2025 SIALAN – Sistem Analisis Laporan KBM Siswa
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="admin_input.js"></script>
+</body>
+</html>
