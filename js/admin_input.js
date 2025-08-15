@@ -124,10 +124,18 @@ async function initSiswaTable() {
   const siswaData = await fetchSiswa();
   const kelasSelect = document.getElementById("kelas");
   const tbody = document.querySelector("#siswaTable tbody");
+  const statusButtons = document.getElementById("statusAllButtons");
 
   kelasSelect.addEventListener("change", () => {
     tbody.innerHTML = "";
     const list = siswaData[kelasSelect.value] || [];
+
+    if(list.length > 0){
+      statusButtons.style.display = "block"; // tampilkan tombol
+    } else {
+      statusButtons.style.display = "none"; // sembunyikan tombol
+    }
+
     list.forEach(siswa=>{
       const row = document.createElement("tr");
       row.innerHTML = `<td>${siswa}</td>
