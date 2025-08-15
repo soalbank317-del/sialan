@@ -59,14 +59,14 @@ const saveEndpoint = "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec";
 // ==========================
 // === Fungsi fetchCSV dengan validasi ===
 // ==========================
-async function fetchCSV(url, columnIndexStart = 0) {
+async function fetchCSV(url) {
   try {
     const res = await fetch(url);
     const text = await res.text();
     if(text.startsWith("<!DOCTYPE html>") || text.includes("Halaman Tidak Ditemukan")){
       throw new Error("CSV tidak tersedia / URL salah");
     }
-    return Papa.parse(text.trim(), { header: false }).data.map(r => r[columnIndexStart]);
+    return Papa.parse(text.trim(), { header: false }).data;
   } catch(err){
     console.error("Gagal fetch CSV:", url, err);
     alert(`Gagal mengambil data dari ${url}. Pastikan sheet sudah di-publish ke web!`);
@@ -78,14 +78,15 @@ async function fetchCSV(url, columnIndexStart = 0) {
 // === Inisialisasi Dropdown ===
 // ==========================
 async function initDropdowns() {
-  const waliData = await fetchCSV(urls.waliKelas, 0);
-  const mapelData = await fetchCSV(urls.mapel, 0);
-  const kelasData = await fetchCSV(urls.kelas, 1);
+  const waliData = await fetchCSV(urls.waliKelas);
+  const mapelData = await fetchCSV(urls.mapel);
+  const kelasData = await fetchCSV(urls.kelas);
 
-  const fillDropdown = (selectId, data, placeholder) => {
+  const fillDropdown = (selectId, data, placeholder, colIndex=0) => {
     const select = document.getElementById(selectId);
     select.innerHTML = `<option value="">${placeholder}</option>`;
-    data.forEach(d=>{
+    data.forEach(r=>{
+      const d = r[colIndex]?.trim();
       if(d){
         const opt = document.createElement("option");
         opt.value = d;
@@ -97,18 +98,18 @@ async function initDropdowns() {
 
   fillDropdown("waliKelas", waliData, "Pilih Wali Kelas");
   fillDropdown("mapel", mapelData, "Pilih Mata Pelajaran");
-  fillDropdown("kelas", kelasData, "Pilih Kelas");
+  fillDropdown("kelas", kelasData, "Pilih Kelas", 1);
 }
 
 // ==========================
 // === Fetch Siswa Per Kelas ===
 // ==========================
 async function fetchSiswa() {
-  const res = await fetchCSV(urls.siswa);
+  const res = await fetchCSV(urls.siswa); 
   const siswaObj = {};
-  res.forEach(r=>{
-    const kelas = r[0]?.trim();
-    const nama = r[1]?.trim();
+  res.forEach(row=>{
+    const kelas = row[0]?.trim();
+    const nama = row[1]?.trim();
     if(kelas && nama){
       if(!siswaObj[kelas]) siswaObj[kelas] = [];
       siswaObj[kelas].push(nama);
@@ -136,9 +137,9 @@ async function initSiswaTable() {
       statusButtons.style.display = "none"; // sembunyikan tombol
     }
 
-    list.forEach(siswa=>{
+    list.forEach(namaSiswa=>{
       const row = document.createElement("tr");
-      row.innerHTML = `<td>${siswa}</td>
+      row.innerHTML = `<td>${namaSiswa}</td>
         <td>
           <select class="form-select" required>
             <option value="">Pilih Status</option>
