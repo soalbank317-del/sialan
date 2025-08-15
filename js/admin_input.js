@@ -199,7 +199,7 @@ document.getElementById("inputForm").addEventListener("submit", async (e)=>{
   const formData = {
     tanggal: document.getElementById("tanggal").value,
     waliKelas: document.getElementById("waliKelas").value,
-    mapel: document.getElementById("matapelajaran").value,
+    matapelajaran: document.getElementById("matapelajaran").value,
     kelas: document.getElementById("kelas").value,
     siswa: siswaData
   };
@@ -226,3 +226,4 @@ initDropdowns()
   .then(()=>initSiswaTable())
   .then(()=>attachSelectAllButtons())
   .finally(()=>overlay.remove()); // hilangkan overlay
+
