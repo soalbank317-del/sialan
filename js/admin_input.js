@@ -51,7 +51,7 @@ document.getElementById('logoutBtn')?.addEventListener('click', e=>{
 // ==========================
 // URL publik CSV Google Sheets yang sudah dipublish
 const urls = {
-  waliKelas: "https://docs.google.com/spreadsheets/d/e/.../pub?gid=1201461529&single=true&output=csv",
+  walikelas: "https://docs.google.com/spreadsheets/d/e/.../pub?gid=1201461529&single=true&output=csv",
   matapelajaran: "https://docs.google.com/spreadsheets/d/e/.../pub?gid=1451676013&single=true&output=csv",
   kelas: "https://docs.google.com/spreadsheets/d/e/.../pub?gid=0&single=true&output=csv",
   siswa: "https://docs.google.com/spreadsheets/d/e/.../pub?gid=852230839&single=true&output=csv"
@@ -89,7 +89,7 @@ async function fetchCSV(url) {
 // ==========================
 // Mengisi dropdown wali kelas, mata pelajaran, dan kelas
 async function initDropdowns() {
-  const waliData = await fetchCSV(urls.waliKelas);
+  const waliData = await fetchCSV(urls.walikelas);
   const mapelData = await fetchCSV(urls.matapelajaran);
   const kelasData = await fetchCSV(urls.kelas);
 
@@ -109,7 +109,7 @@ async function initDropdowns() {
   };
 
   // Isi masing-masing dropdown
-  fillDropdown("waliKelas", waliData, "Pilih Wali Kelas", 0);
+  fillDropdown("walikelas", waliData, "Pilih Wali Kelas", 0);
   fillDropdown("matapelajaran", mapelData, "Pilih Mata Pelajaran", 0);
   fillDropdown("kelas", kelasData, "Pilih Kelas", 0); // index kolom kelas = 0
 }
@@ -198,7 +198,7 @@ document.getElementById("inputForm").addEventListener("submit", async (e)=>{
   // bentuk data yang dikirim ke Apps Script
   const formData = {
     tanggal: document.getElementById("tanggal").value,
-    waliKelas: document.getElementById("waliKelas").value,
+    walikelas: document.getElementById("walikelas").value,
     matapelajaran: document.getElementById("matapelajaran").value,
     kelas: document.getElementById("kelas").value,
     siswa: siswaData
@@ -226,4 +226,5 @@ initDropdowns()
   .then(()=>initSiswaTable())
   .then(()=>attachSelectAllButtons())
   .finally(()=>overlay.remove()); // hilangkan overlay
+
 
