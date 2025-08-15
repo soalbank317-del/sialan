@@ -36,23 +36,46 @@
   <div class="card">
     <h3 class="mb-3">Input Data KBM</h3>
 
-    <form id="inputForm">
+<form id="inputForm">
+      <!-- Tanggal -->
       <div class="mb-3">
         <label for="tanggal" class="form-label">Tanggal</label>
         <input type="date" id="tanggal" class="form-control" required>
       </div>
+
+      <!-- Wali Kelas -->
+      <div class="mb-3">
+        <label for="waliKelas" class="form-label">Wali Kelas</label>
+        <select id="waliKelas" class="form-select" required>
+          <option value="">Memuat data...</option>
+        </select>
+      </div>
+
+      <!-- Mata Pelajaran -->
       <div class="mb-3">
         <label for="mapel" class="form-label">Mata Pelajaran</label>
-        <input type="text" id="mapel" class="form-control" required>
+        <select id="mapel" class="form-select" required>
+          <option value="">Memuat data...</option>
+        </select>
       </div>
+
+      <!-- Kelas -->
       <div class="mb-3">
         <label for="kelas" class="form-label">Kelas</label>
-        <input type="text" id="kelas" class="form-control" required>
+        <select id="kelas" class="form-select" required>
+          <option value="">Memuat data...</option>
+        </select>
       </div>
+
+      <!-- Nama Siswa -->
       <div class="mb-3">
         <label for="namaSiswa" class="form-label">Nama Siswa</label>
-        <input type="text" id="namaSiswa" class="form-control" required>
+        <select id="namaSiswa" class="form-select" required>
+          <option value="">Memuat data...</option>
+        </select>
       </div>
+
+      <!-- Status -->
       <div class="mb-3">
         <label for="status" class="form-label">Status</label>
         <select id="status" class="form-select" required>
@@ -61,6 +84,7 @@
           <option value="Ujian">Ujian</option>
         </select>
       </div>
+
       <button type="submit" class="btn btn-primary">Simpan</button>
     </form>
   </div>
@@ -74,6 +98,7 @@
 <script src="js/admin_input.js"></script>
 </body>
 </html>
+
 
 
 
