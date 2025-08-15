@@ -6,6 +6,7 @@ let allData = [], filteredData = [], currentPage = 1, rowsPerPage = 15;
 // ===========================================
 // Fungsi: parseIndoDateTime
 // ===========================================
+// Mengubah tanggal Indonesia "dd/mm/yyyy hh:mm:ss" menjadi objek Date
 function parseIndoDateTime(dateStr) {
   const [datePart, timePart] = dateStr.split(" ");
   if (!datePart) return new Date(dateStr);
@@ -25,6 +26,7 @@ function sortByLatestDate(data) {
 // ===========================================
 // Fungsi: loadRekapData
 // ===========================================
+// Memuat CSV dari Google Sheets
 async function loadRekapData() {
   const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQAEwBLEhaehGYlzYsNhBPfmozGvRZmpjyEOHC8rfgduB0JRurz-xwI_jfW8Fw8Vaz93a_E9tLyuIX9/pub?gid=0&single=true&output=csv";
   const res = await fetch(url);
@@ -69,7 +71,7 @@ function renderTablePage(page){
   document.getElementById('pageNum').textContent = currentPage;
   document.getElementById('totalPages').textContent = Math.ceil(filteredData.length/rowsPerPage);
 
-  // Tambahkan jumlah data yang ditemukan
+  // Tampilkan jumlah data yang ditemukan
   document.getElementById('totalFiltered').textContent = `Jumlah Data Ditemukan: ${filteredData.length}`;
 }
 
@@ -78,7 +80,7 @@ function renderTablePage(page){
 // ===========================================
 function applyFilters(){
   const kelas = document.getElementById('filterKelas').value;
-  const matapelajaran = document.getElementById('filterMatapelajaran').value;
+  const matapelajaran = document.getElementById('filterMatapelajaran').value; // ID sudah diperbaiki
   const status = document.getElementById('filterStatus').value;
   const search = document.getElementById('searchNama').value.toLowerCase();
 
@@ -114,7 +116,7 @@ async function init(){
   document.getElementById('applyFilter').addEventListener('click', applyFilters);
   document.getElementById('resetFilter').addEventListener('click', ()=>{
     document.getElementById('filterKelas').value = '';
-    document.getElementById('filtermatapelajaran').value = '';
+    document.getElementById('filterMatapelajaran').value = '';
     document.getElementById('filterStatus').value = '';
     document.getElementById('searchNama').value = '';
     filteredData = sortByLatestDate([...allData]);
@@ -138,5 +140,3 @@ async function init(){
 
 // Jalankan inisialisasi
 init();
-
-
