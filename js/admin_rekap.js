@@ -49,15 +49,14 @@ if(document.getElementById('rekapTable')){
   let selectedRowIndex=null;
 
   // ===== Fungsi parsing tanggal Indonesia menjadi Date =====
-  function parseIndoDateTime(dateStr){
+  function parseIndoDate(dateStr){
     if(!dateStr) return new Date();
-    const [datePart] = dateStr.split(" ");
-    const [d,m,y] = datePart.split("/").map(Number);
+    const [d,m,y] = dateStr.split("/").map(Number);
     return new Date(y,m-1,d);
   }
 
   function sortByLatestDate(data){
-    return data.sort((a,b)=>parseIndoDateTime(b.Tanggal)-parseIndoDateTime(a.Tanggal));
+    return data.sort((a,b)=>parseIndoDate(b.Tanggal)-parseIndoDate(a.Tanggal));
   }
 
   // ===== Load data via Apps Script =====
@@ -129,9 +128,7 @@ if(document.getElementById('rekapTable')){
     document.getElementById('editNama').value = data.Nama_Siswa||'';
     document.getElementById('editStatus').value = data.Status||'';
 
-    const modalEl = document.getElementById('editModal');
-    const modal = new bootstrap.Modal(modalEl);
-    modal.show();
+    new bootstrap.Modal(document.getElementById('editModal')).show();
   }
 
   // ===== Submit edit form =====
