@@ -34,36 +34,6 @@ if(logoutBtn){
         window.location.href = 'login.html';
     });
 }
-
-// --- Submit Form Input KBM ---
-document.getElementById('inputForm').addEventListener('submit', function(e){
-    e.preventDefault();
-    
-    const tanggal = document.getElementById('tanggal').value;
-    const mapel = document.getElementById('mapel').value.trim();
-    const kelas = document.getElementById('kelas').value.trim();
-    const namaSiswa = document.getElementById('namaSiswa').value.trim();
-    const status = document.getElementById('status').value;
-
-    // --- Validasi Input ---
-    if(!tanggal || !mapel || !kelas || !namaSiswa || !status){
-        alert("Semua kolom wajib diisi!");
-        return;
-    }
-
-    // --- Simulasi Menyimpan Data ---
-    const dataObj = {
-        Tanggal: tanggal,
-        Mata_Pelajaran: mapel,
-        Kelas: kelas,
-        Nama_Siswa: namaSiswa,
-        Status: status
-    };
-    console.log("Data disimpan:", dataObj);
-
-    alert("Data berhasil disimpan (simulasi)");
-    document.getElementById('inputForm').reset();
-});
   
 // --------------------------------------------------------------------------- //
 // =======================================
@@ -179,4 +149,5 @@ if(document.getElementById('rekapTable')){
 
     initRekap();
 }
+
 
