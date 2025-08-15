@@ -185,4 +185,19 @@ document.getElementById("inputForm").addEventListener("submit", async (e)=>{
 // ==========================
 initDropdowns();
 initSiswaTable();
+
+// ==========================
+// === Tombol Pilih Semua ===
+// ==========================
+document.getElementById('tuntasAll').addEventListener('click', ()=>{
+  const selects = document.querySelectorAll("#siswaTable tbody select");
+  selects.forEach(s => s.value = "Tuntas");
+});
+
+document.getElementById('ujianAll').addEventListener('click', ()=>{
+  const selects = document.querySelectorAll("#siswaTable tbody select");
+  selects.forEach(s => s.value = "Ujian");
+});
+
 overlay.remove();
+
