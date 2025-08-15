@@ -1,32 +1,44 @@
-// Buat overlay loading
+// ==========================
+// === Overlay / Loader ===
+// ==========================
 const overlay = document.createElement('div');
-overlay.style.position = 'fixed';
-overlay.style.top = 0;
-overlay.style.left = 0;
-overlay.style.width = '100%';
-overlay.style.height = '100%';
-overlay.style.background = '#fff';
-overlay.style.zIndex = 9999;
-overlay.style.display = 'flex';
-overlay.style.alignItems = 'center';
-overlay.style.justifyContent = 'center';
-overlay.innerHTML = '<h5>Memeriksa login...</h5>';
-document.body.appendChild(overlay);
+overlay.id = 'overlay';
+Object.assign(overlay.style, {
+  position: 'fixed',
+  top: '0',
+  left: '0',
+  width: '100%',
+  height: '100%',
+  background: 'rgba(255,255,255,0.9)',
+  zIndex: '9999',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center'
+});
+overlay.innerHTML = `
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+`;
+document.body.prepend(overlay);
 
-// Proteksi Login
-window.addEventListener('DOMContentLoaded', () => {
-    const user = sessionStorage.getItem('user');
+// ==========================
+// === Proteksi Login ===
+// ==========================
+const user = sessionStorage.getItem('user');
+if(!user){
+  overlay.remove();
+  alert('Anda belum login! Akses ditolak.');
+  window.location.href = 'login.html';
+}
 
-    if(!user){
-        // redirect halus
-        setTimeout(() => {
-            window.location.href = 'login.html';
-        }, 500);
-    } else {
-        console.log("Admin:", user);
-        // hapus overlay setelah valid
-        document.body.removeChild(overlay);
-    }
+// ==========================
+// === Logout Handler ===
+// ==========================
+document.getElementById('logoutBtn')?.addEventListener('click', e=>{
+  e.preventDefault();
+  sessionStorage.removeItem('user');
+  window.location.href='index.html';
 });
 
 // CSV Publik Google Sheets
@@ -141,3 +153,4 @@ document.getElementById("inputForm").addEventListener("submit", async (e) => {
 // Inisialisasi
 initDropdowns();
 initSiswaTable();
+
