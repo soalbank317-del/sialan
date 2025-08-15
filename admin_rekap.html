@@ -33,7 +33,7 @@
 </nav>
 
 <section class="container my-4">
-  <div class="card">
+  <div class="card p-3">
     <h3 class="mb-3">Rekap KBM Siswa</h3>
 
     <!-- Filters -->
@@ -72,6 +72,7 @@
             <th>Kelas</th>
             <th>Nama Siswa</th>
             <th>Status</th>
+            <th style="width:80px;">Aksi</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -89,6 +90,54 @@
   </div>
 </section>
 
+<!-- Modal Edit Data -->
+<div class="modal fade" id="editModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Data KBM</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="editForm">
+          <div class="mb-3">
+            <label for="editTanggal" class="form-label">Tanggal</label>
+            <input type="date" class="form-control" id="editTanggal" required>
+          </div>
+          <div class="mb-3">
+            <label for="editWali" class="form-label">Wali Kelas</label>
+            <input type="text" class="form-control" id="editWali" required>
+          </div>
+          <div class="mb-3">
+            <label for="editMapel" class="form-label">Mata Pelajaran</label>
+            <input type="text" class="form-control" id="editMapel" required>
+          </div>
+          <div class="mb-3">
+            <label for="editKelas" class="form-label">Kelas</label>
+            <input type="text" class="form-control" id="editKelas" required>
+          </div>
+          <div class="mb-3">
+            <label for="editNama" class="form-label">Nama Siswa</label>
+            <input type="text" class="form-control" id="editNama" required>
+          </div>
+          <div class="mb-3">
+            <label for="editStatus" class="form-label">Status</label>
+            <select class="form-select" id="editStatus" required>
+              <option value="Tuntas">Tuntas</option>
+              <option value="Ujian">Ujian</option>
+            </select>
+          </div>
+          <input type="hidden" id="editRowIndex">
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+        <button type="submit" form="editForm" class="btn btn-primary">Simpan Perubahan</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <footer>
   © 2025 SIALAN – Sistem Analisis Laporan KBM Siswa
 </footer>
@@ -98,10 +147,3 @@
 <script src="js/admin_rekap.js"></script>
 </body>
 </html>
-
-
-
-
-
-
-
