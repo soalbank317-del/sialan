@@ -46,7 +46,7 @@ document.getElementById('logoutBtn')?.addEventListener('click', e=>{
 // ==========================
 const urls = {
   waliKelas: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQXOP4L2k61miTcFTlb4r0QigIWRsMzVazznXCbNLqaHBpwY9RKgjnXdW4figjJZLmrrPcXbU6Q1f-E/pub?gid=1201461529&single=true&output=csv",
-  mapel: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQXOP4L2k61miTcFTlb4r0QigIWRsMzVazznXCbNLqaHBpwY9RKgjnXdW4figjJZLmrrPcXbU6Q1f-E/pub?gid=1451676013&single=true&output=csv",
+  matapelajaran: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQXOP4L2k61miTcFTlb4r0QigIWRsMzVazznXCbNLqaHBpwY9RKgjnXdW4figjJZLmrrPcXbU6Q1f-E/pub?gid=1451676013&single=true&output=csv",
   kelas: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQXOP4L2k61miTcFTlb4r0QigIWRsMzVazznXCbNLqaHBpwY9RKgjnXdW4figjJZLmrrPcXbU6Q1f-E/pub?gid=0&single=true&output=csv",
   siswa: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQXOP4L2k61miTcFTlb4r0QigIWRsMzVazznXCbNLqaHBpwY9RKgjnXdW4figjJZLmrrPcXbU6Q1f-E/pub?gid=852230839&single=true&output=csv"
 };
@@ -79,7 +79,7 @@ async function fetchCSV(url) {
 // ==========================
 async function initDropdowns() {
   const waliData = await fetchCSV(urls.waliKelas);
-  const mapelData = await fetchCSV(urls.mapel);
+  const mapelData = await fetchCSV(urls.matapelajaran);
   const kelasData = await fetchCSV(urls.kelas);
 
   const fillDropdown = (selectId, data, placeholder, colIndex=0) => {
@@ -182,7 +182,7 @@ document.getElementById("inputForm").addEventListener("submit", async (e)=>{
   const formData = {
     tanggal: document.getElementById("tanggal").value,
     waliKelas: document.getElementById("waliKelas").value,
-    mapel: document.getElementById("mapel").value,
+    mapel: document.getElementById("matapelajaran").value,
     kelas: document.getElementById("kelas").value,
     siswa: siswaData
   };
@@ -208,5 +208,6 @@ initDropdowns()
   .then(()=>initSiswaTable())
   .then(()=>attachSelectAllButtons())
   .finally(()=>overlay.remove());
+
 
 
