@@ -9,7 +9,6 @@ if(!user){
   window.location.href = 'login.html'; // arahkan ke halaman login
 }
 
-
 // ==========================
 // === Logout Handler ===
 // ==========================
@@ -210,3 +209,4 @@ if(document.getElementById('rekapTable')){
   // ===== Init awal =====
   loadRekapData(); // ambil data pertama kali dari server
 }
+
