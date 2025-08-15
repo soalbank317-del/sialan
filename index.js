@@ -55,8 +55,9 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-<script src="index.js"></script>
+<script src="js/index.js"></script>
 </body>
 </html>
+
 
 
