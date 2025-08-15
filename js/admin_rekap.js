@@ -50,12 +50,11 @@ if (document.getElementById('rekapTable')) {
   let selectedRowIndex = null;
 
   // ===== Fungsi parsing tanggal Indonesia menjadi Date =====
-  function parseIndoDateTime(dateStr) {
+  function parseIndoDateTime(dateStr = '') {
+    if(!dateStr) return new Date(0);
     const [datePart, timePart] = dateStr.split(" ");
-    if (!datePart) return new Date(dateStr);
-    const [day, month, year] = datePart.split("/").map(Number);
-    let hours = 0, minutes = 0, seconds = 0;
-    if (timePart) [hours, minutes, seconds] = timePart.split(":").map(Number);
+    const [day, month, year] = (datePart || '').split("/").map(Number);
+    let [hours=0, minutes=0, seconds=0] = (timePart || '').split(":").map(Number);
     return new Date(year, month-1, day, hours, minutes, seconds);
   }
 
@@ -66,9 +65,15 @@ if (document.getElementById('rekapTable')) {
 
   // ===== Fungsi load data dari Web App Google Apps Script =====
   async function loadRekapData() {
-    const res = await fetch(webAppUrl);
-    const data = await res.json(); // Web App harus return JSON dari getRekapData()
-    return data;
+    try {
+      const res = await fetch(webAppUrl);
+      if(!res.ok) throw new Error('Gagal fetch data');
+      return await res.json();
+    } catch(err) {
+      overlay.remove();
+      alert('Gagal memuat data: ' + err.message);
+      return [];
+    }
   }
 
   // ===== Update total data yang difilter =====
@@ -83,8 +88,10 @@ if (document.getElementById('rekapTable')) {
     tbody.innerHTML = '';
     const start = (page-1)*rowsPerPage;
     const end = start + rowsPerPage;
+
+    let html = '';
     filteredData.slice(start, end).forEach((row, idx) => {
-      tbody.innerHTML += `
+      html += `
         <tr>
           <td>${row.Tanggal || ''}</td>
           <td>${row.Wali_Kelas || ''}</td>
@@ -99,14 +106,14 @@ if (document.getElementById('rekapTable')) {
       `;
     });
 
-    if(filteredData.length===0){
-      tbody.innerHTML = '<tr><td colspan="7" class="text-center">Data tidak tersedia</td></tr>';
-    }
+    if(html==='') html = '<tr><td colspan="7" class="text-center">Data tidak tersedia</td></tr>';
+    tbody.innerHTML = html;
 
     document.getElementById('pageNum').textContent = currentPage;
-    document.getElementById('totalPages').textContent = Math.ceil(filteredData.length/rowsPerPage);
+    document.getElementById('totalPages').textContent = Math.ceil(filteredData.length/rowsPerPage) || 1;
     updateTotalFiltered();
 
+    // Event listener tombol edit
     document.querySelectorAll('.editBtn').forEach(btn => {
       btn.addEventListener('click', e => {
         selectedRowIndex = parseInt(e.target.dataset.index);
@@ -143,22 +150,24 @@ if (document.getElementById('rekapTable')) {
       Status: document.getElementById('editStatus').value
     };
 
-    // Update filteredData
-    filteredData[selectedRowIndex] = updated;
-
-    // Render ulang tabel
-    renderTablePage(currentPage);
+    // Update allData & filteredData agar tetap sinkron
+    allData[selectedRowIndex] = {...updated};
+    applyFilters();
 
     // Tutup modal
     const modalEl = document.getElementById('editModal');
     bootstrap.Modal.getInstance(modalEl).hide();
 
     // Kirim ke Web App untuk update Sheet
-    await fetch(webAppUrl, {
-      method: "POST",
-      body: JSON.stringify({updatedData: updated, rowIndex: selectedRowIndex}),
-      headers: {"Content-Type": "application/json"}
-    });
+    try {
+      await fetch(webAppUrl, {
+        method: "POST",
+        body: JSON.stringify({updatedData: updated, rowIndex: selectedRowIndex}),
+        headers: {"Content-Type": "application/json"}
+      });
+    } catch(err) {
+      alert('Gagal mengirim update: '+err.message);
+    }
   });
 
   // ===== Filter data =====
@@ -176,7 +185,7 @@ if (document.getElementById('rekapTable')) {
     );
 
     filteredData = sortByLatestDate(filteredData);
-    currentPage = 1;
+    currentPage = Math.min(currentPage, Math.ceil(filteredData.length/rowsPerPage) || 1);
     renderTablePage(currentPage);
   }
 
@@ -209,6 +218,9 @@ if (document.getElementById('rekapTable')) {
       currentPage = 1;
       renderTablePage(currentPage);
     });
+
+    // Filter otomatis saat mengetik
+    document.getElementById('searchNama').addEventListener('input', applyFilters);
 
     // Pagination
     document.getElementById('rowsPerPage').addEventListener('change', e=>{
