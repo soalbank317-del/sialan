@@ -63,7 +63,6 @@ async function fetchCSV(url, columnIndexStart = 0) {
   try {
     const res = await fetch(url);
     const text = await res.text();
-    // Cek apakah response bukan CSV
     if(text.startsWith("<!DOCTYPE html>") || text.includes("Halaman Tidak Ditemukan")){
       throw new Error("CSV tidak tersedia / URL salah");
     }
@@ -119,7 +118,7 @@ async function fetchSiswa() {
 }
 
 // ==========================
-// === Event Pilih Kelas ===
+// === Event Pilih Kelas & Generate Tabel ===
 // ==========================
 async function initSiswaTable() {
   const siswaData = await fetchSiswa();
@@ -141,6 +140,19 @@ async function initSiswaTable() {
         </td>`;
       tbody.appendChild(row);
     });
+  });
+}
+
+// ==========================
+// === Tombol Pilih Semua Status ===
+// ==========================
+function attachSelectAllButtons() {
+  document.getElementById('tuntasAll').addEventListener('click', ()=>{
+    document.querySelectorAll("#siswaTable tbody select").forEach(s => s.value = "Tuntas");
+  });
+
+  document.getElementById('ujianAll').addEventListener('click', ()=>{
+    document.querySelectorAll("#siswaTable tbody select").forEach(s => s.value = "Ujian");
   });
 }
 
@@ -183,21 +195,7 @@ document.getElementById("inputForm").addEventListener("submit", async (e)=>{
 // ==========================
 // === Inisialisasi Halaman ===
 // ==========================
-initDropdowns();
-initSiswaTable();
-
-// ==========================
-// === Tombol Pilih Semua ===
-// ==========================
-document.getElementById('tuntasAll').addEventListener('click', ()=>{
-  const selects = document.querySelectorAll("#siswaTable tbody select");
-  selects.forEach(s => s.value = "Tuntas");
-});
-
-document.getElementById('ujianAll').addEventListener('click', ()=>{
-  const selects = document.querySelectorAll("#siswaTable tbody select");
-  selects.forEach(s => s.value = "Ujian");
-});
-
-overlay.remove();
-
+initDropdowns()
+  .then(()=>initSiswaTable())
+  .then(()=>attachSelectAllButtons())
+  .finally(()=>overlay.remove());
