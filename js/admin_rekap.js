@@ -1,89 +1,76 @@
 // ==========================
-// === Proteksi Login ===
+// Proteksi Login
 // ==========================
-// Mengecek apakah user sudah login dari sessionStorage
 const user = sessionStorage.getItem('user');
 if(!user){
-  overlay.remove(); // hapus overlay jika gagal login
   alert('Anda belum login! Akses ditolak.');
-  window.location.href = 'login.html'; // arahkan ke halaman login
+  window.location.href = 'login.html';
 }
 
 // ==========================
-// === Logout Handler ===
+// Logout Handler
 // ==========================
-// Event untuk tombol logout
 document.getElementById('logoutBtn')?.addEventListener('click', e=>{
   e.preventDefault();
-  sessionStorage.removeItem('user'); // hapus session login
-  window.location.href='index.html'; // arahkan ke halaman utama
+  sessionStorage.removeItem('user');
+  window.location.href='index.html';
 });
 
-
 // ==========================
-// === Rekap Data & Modal Edit ===
+// Rekap Data & Modal Edit
 // ==========================
-// Hanya dijalankan jika elemen tabel #rekapTable ada di halaman
 if(document.getElementById('rekapTable')){
-  let allData = [],        // semua data dari server
-      filteredData = [],   // data yang sudah difilter
-      currentPage = 1,     // halaman saat ini
-      rowsPerPage = 15,    // jumlah baris per halaman
-      selectedRowIndex = null; // index data yang sedang diedit
+  let allData = [],
+      filteredData = [],
+      currentPage = 1,
+      rowsPerPage = 15,
+      selectedRowIndex = null;
 
-
-  // ===== Fungsi parsing tanggal Indonesia menjadi Date =====
+  // Parse tanggal Indonesia ke Date
   function parseIndoDate(dateStr){
     if(!dateStr) return new Date();
-    const [d, m, y] = dateStr.split("/").map(Number);
-    return new Date(y, m - 1, d); // urutan: tahun, bulan (0-based), tanggal
+    const [d,m,y] = dateStr.split("/").map(Number);
+    return new Date(y, m-1, d);
   }
 
-  // ===== Fungsi urutkan data dari tanggal terbaru =====
+  // Sort by latest date
   function sortByLatestDate(data){
-    return data.sort((a, b) => parseIndoDate(b.Tanggal) - parseIndoDate(a.Tanggal));
+    return data.sort((a,b) => parseIndoDate(b.Tanggal) - parseIndoDate(a.Tanggal));
   }
 
-
-  // ===== Load data via Apps Script =====
+  // Load data dari Apps Script
   function loadRekapData(){
     google.script.run.withSuccessHandler(res=>{
       allData = res || [];
       allData = sortByLatestDate(allData);
       filteredData = [...allData];
-      initFilters(); // siapkan pilihan filter
-      renderTablePage(currentPage); // render tabel pertama kali
-      overlay.remove(); // hilangkan loading
+      initFilters();
+      renderTablePage(currentPage);
     }).getRekapData();
   }
 
-
-  // ===== Initialize filter dropdowns =====
+  // Inisialisasi filter dropdown
   function initFilters(){
     const kelasEl = document.getElementById('filterKelas');
-    const mapelEl = document.getElementById('filterMapel');
+    const mapelEl = document.getElementById('filterMatapelajaran');
 
-    // Ambil daftar kelas unik dari data
     [...new Set(allData.map(d=>d.Kelas).filter(Boolean))].forEach(k=>{
       kelasEl.innerHTML += `<option value="${k}">${k}</option>`;
     });
 
-    // Ambil daftar mata pelajaran unik
     [...new Set(allData.map(d=>d.Mata_Pelajaran).filter(Boolean))].forEach(m=>{
       mapelEl.innerHTML += `<option value="${m}">${m}</option>`;
     });
   }
 
-
-  // ===== Render tabel halaman tertentu =====
+  // Render tabel halaman tertentu
   function renderTablePage(page){
     const tbody = document.querySelector('#rekapTable tbody');
     tbody.innerHTML = '';
-    const start = (page - 1) * rowsPerPage;
+    const start = (page-1)*rowsPerPage;
     const end = start + rowsPerPage;
 
-    // Tampilkan data per halaman
-    filteredData.slice(start, end).forEach((row, idx)=>{
+    filteredData.slice(start,end).forEach((row, idx)=>{
       tbody.innerHTML += `<tr>
         <td>${row.Tanggal || ''}</td>
         <td>${row.Wali_Kelas || ''}</td>
@@ -95,12 +82,10 @@ if(document.getElementById('rekapTable')){
       </tr>`;
     });
 
-    // Jika tidak ada data
     if(filteredData.length === 0){
       tbody.innerHTML = '<tr><td colspan="7" class="text-center">Data tidak tersedia</td></tr>';
     }
 
-    // Update pagination info
     document.getElementById('pageNum').textContent = currentPage;
     document.getElementById('totalPages').textContent = Math.ceil(filteredData.length / rowsPerPage);
     document.getElementById('totalFiltered').textContent = `Total Data: ${filteredData.length}`;
@@ -114,8 +99,7 @@ if(document.getElementById('rekapTable')){
     });
   }
 
-
-  // ===== Open modal edit =====
+  // Open modal edit
   function openEditModal(data){
     document.getElementById('editTanggal').value = data.Tanggal || '';
     document.getElementById('editWali').value = data.Wali_Kelas || '';
@@ -127,8 +111,7 @@ if(document.getElementById('rekapTable')){
     new bootstrap.Modal(document.getElementById('editModal')).show();
   }
 
-
-  // ===== Submit edit form =====
+  // Submit edit form
   document.getElementById('editForm').addEventListener('submit', e=>{
     e.preventDefault();
     if(selectedRowIndex === null) return;
@@ -142,19 +125,17 @@ if(document.getElementById('rekapTable')){
       Status: document.getElementById('editStatus').value
     };
 
-    // Kirim ke server untuk update data
     google.script.run.withSuccessHandler(()=>{
-      filteredData[selectedRowIndex] = updatedData; // update di array
-      renderTablePage(currentPage); // render ulang tabel
+      filteredData[selectedRowIndex] = updatedData;
+      renderTablePage(currentPage);
       bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
     }).updateRekapData(updatedData, selectedRowIndex);
   });
 
-
-  // ===== Apply filter =====
+  // Apply filter
   function applyFilters(){
     const kelas = document.getElementById('filterKelas').value;
-    const mapel = document.getElementById('filterMapel').value;
+    const mapel = document.getElementById('filterMatapelajaran').value;
     const status = document.getElementById('filterStatus').value;
     const search = document.getElementById('searchNama').value.toLowerCase();
 
@@ -170,12 +151,11 @@ if(document.getElementById('rekapTable')){
     renderTablePage(currentPage);
   }
 
-
-  // ===== Reset filter =====
+  // Event filter
   document.getElementById('applyFilter').addEventListener('click', applyFilters);
   document.getElementById('resetFilter').addEventListener('click', ()=>{
     document.getElementById('filterKelas').value = '';
-    document.getElementById('filterMapel').value = '';
+    document.getElementById('filterMatapelajaran').value = '';
     document.getElementById('filterStatus').value = '';
     document.getElementById('searchNama').value = '';
     filteredData = sortByLatestDate([...allData]);
@@ -183,8 +163,7 @@ if(document.getElementById('rekapTable')){
     renderTablePage(currentPage);
   });
 
-
-  // ===== Rows per page & pagination =====
+  // Pagination controls
   document.getElementById('rowsPerPage').addEventListener('change', e=>{
     rowsPerPage = parseInt(e.target.value);
     currentPage = 1;
@@ -205,8 +184,6 @@ if(document.getElementById('rekapTable')){
     }
   });
 
-
-  // ===== Init awal =====
-  loadRekapData(); // ambil data pertama kali dari server
+  // Init
+  loadRekapData();
 }
-
