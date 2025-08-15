@@ -51,10 +51,10 @@ document.getElementById('logoutBtn')?.addEventListener('click', e=>{
 // ==========================
 // URL publik CSV Google Sheets yang sudah dipublish
 const urls = {
-  walikelas: "https://docs.google.com/spreadsheets/d/e/.../pub?gid=1201461529&single=true&output=csv",
-  matapelajaran: "https://docs.google.com/spreadsheets/d/e/.../pub?gid=1451676013&single=true&output=csv",
-  kelas: "https://docs.google.com/spreadsheets/d/e/.../pub?gid=0&single=true&output=csv",
-  siswa: "https://docs.google.com/spreadsheets/d/e/.../pub?gid=852230839&single=true&output=csv"
+  walikelas: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQXOP4L2k61miTcFTlb4r0QigIWRsMzVazznXCbNLqaHBpwY9RKgjnXdW4figjJZLmrrPcXbU6Q1f-E/pubhtml?gid=1201461529&single=true",
+  matapelajaran: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQXOP4L2k61miTcFTlb4r0QigIWRsMzVazznXCbNLqaHBpwY9RKgjnXdW4figjJZLmrrPcXbU6Q1f-E/pubhtml?gid=1451676013&single=true",
+  kelas: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQXOP4L2k61miTcFTlb4r0QigIWRsMzVazznXCbNLqaHBpwY9RKgjnXdW4figjJZLmrrPcXbU6Q1f-E/pubhtml?gid=0&single=true",
+  siswa: "https://docs.google.com/spreadsheets/d/e/2PACX-1vQXOP4L2k61miTcFTlb4r0QigIWRsMzVazznXCbNLqaHBpwY9RKgjnXdW4figjJZLmrrPcXbU6Q1f-E/pubhtml?gid=852230839&single=true"
 };
 
 // ==========================
@@ -226,5 +226,6 @@ initDropdowns()
   .then(()=>initSiswaTable())
   .then(()=>attachSelectAllButtons())
   .finally(()=>overlay.remove()); // hilangkan overlay
+
 
 
