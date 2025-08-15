@@ -96,9 +96,9 @@ async function initDropdowns() {
     });
   };
 
-  fillDropdown("waliKelas", waliData, "Pilih Wali Kelas");
-  fillDropdown("matapelajaran", mapelData, "Pilih Mata Pelajaran");
-  fillDropdown("kelas", kelasData, "Pilih Kelas", 0);
+fillDropdown("waliKelas", waliData, "Pilih Wali Kelas", 0);
+fillDropdown("matapelajaran", mapelData, "Pilih Mata Pelajaran", 0);
+fillDropdown("kelas", kelasData, "Pilih Kelas", 0); // sebelumnya 1
 }
 
 // ==========================
@@ -203,4 +203,5 @@ initDropdowns()
   .then(()=>initSiswaTable())
   .then(()=>attachSelectAllButtons())
   .finally(()=>overlay.remove());
+
 
