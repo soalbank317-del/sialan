@@ -57,7 +57,7 @@ const urls = {
 const saveEndpoint = "https://script.google.com/macros/s/AKfycbwv7x7eHXHQDjFQcylMbwVuFitikFfAEsm8ARwa9gibE1RKinQpwfTSSHMe3Eqr0gWH/exec";
 
 // ==========================
-// === Fungsi fetchCSV dengan validasi ===
+// === Fungsi fetchCSV ===
 // ==========================
 async function fetchCSV(url) {
   try {
@@ -119,7 +119,7 @@ async function fetchSiswa() {
 }
 
 // ==========================
-// === Event Pilih Kelas & Generate Tabel ===
+// === Generate Tabel Siswa ===
 // ==========================
 async function initSiswaTable() {
   const siswaData = await fetchSiswa();
@@ -131,11 +131,7 @@ async function initSiswaTable() {
     tbody.innerHTML = "";
     const list = siswaData[kelasSelect.value] || [];
 
-    if(list.length > 0){
-      statusButtons.style.display = "block"; // tampilkan tombol
-    } else {
-      statusButtons.style.display = "none"; // sembunyikan tombol
-    }
+    statusButtons.style.display = list.length > 0 ? "block" : "none";
 
     list.forEach(namaSiswa=>{
       const row = document.createElement("tr");
@@ -159,7 +155,6 @@ function attachSelectAllButtons() {
   document.getElementById('tuntasAll').addEventListener('click', ()=>{
     document.querySelectorAll("#siswaTable tbody select").forEach(s => s.value = "Tuntas");
   });
-
   document.getElementById('ujianAll').addEventListener('click', ()=>{
     document.querySelectorAll("#siswaTable tbody select").forEach(s => s.value = "Ujian");
   });
@@ -190,7 +185,7 @@ document.getElementById("inputForm").addEventListener("submit", async (e)=>{
   try{
     const res = await fetch(saveEndpoint, {
       method: "POST",
-      body: JSON.stringify(formData),
+      body: JSON.stringify({ form: formData }), // ✅ harus dibungkus form
       headers: { "Content-Type": "application/json" }
     });
     const result = await res.json();
@@ -208,6 +203,3 @@ initDropdowns()
   .then(()=>initSiswaTable())
   .then(()=>attachSelectAllButtons())
   .finally(()=>overlay.remove());
-
-
-
