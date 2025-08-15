@@ -39,13 +39,12 @@ async function loadRekapData() {
   const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQAEwBLEhaehGYlzYsNhBPfmozGvRZmpjyEOHC8rfgduB0JRurz-xwI_jfW8Fw8Vaz93a_E9tLyuIX9/pub?gid=0&single=true&output=csv";
   const res = await fetch(url);
   const csvText = await res.text();
-  const lines = csvText.split("\n").filter(l => l.trim() !== ""); // hapus baris kosong
-  // Gunakan tab sebagai pemisah karena CSV dipisahkan tab
-  const headers = lines[0].split("\t").map(h => h.trim().replace(/\s+/g, "_")); 
+  const lines = csvText.split("\n").filter(l => l.trim() !== "");
+  const headers = lines[0].split(",").map(h => h.trim().replace(/\s+/g, "_")); // gunakan koma
   return lines.slice(1).map(line => {
-    const vals = line.split("\t"); // pisahkan tiap kolom
+    const vals = line.split(",");
     const obj = {};
-    headers.forEach((h,i)=> obj[h] = (vals[i]||"").trim()); // mapping header → value
+    headers.forEach((h,i)=> obj[h] = (vals[i]||"").trim());
     return obj;
   });
 }
@@ -147,3 +146,4 @@ async function init(){
 
 // Jalankan inisialisasi saat halaman load
 init();
+
