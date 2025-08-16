@@ -43,6 +43,10 @@ if(document.getElementById('rekapTable')){
     google.script.run.withSuccessHandler(res=>{
       allData = res || [];
       allData = sortByLatestDate(allData);
+
+      // Tambahkan rowNumber untuk update
+      allData.forEach((d, idx)=> d.rowNumber = idx+2);
+
       filteredData = [...allData];
       initFilters();
       renderTablePage(currentPage);
@@ -78,7 +82,7 @@ if(document.getElementById('rekapTable')){
         <td>${row.Kelas || ''}</td>
         <td>${row.Nama_Siswa || ''}</td>
         <td>${row.Status || ''}</td>
-        <td><button class="btn btn-sm btn-warning editBtn" data-index="${start + idx}">Edit</button></td>
+        <td><button class="btn btn-sm btn-warning editBtn" data-index="${start + idx}">Edit Status</button></td>
       </tr>`;
     });
 
@@ -99,7 +103,7 @@ if(document.getElementById('rekapTable')){
     });
   }
 
-  // Open modal edit
+  // Open modal edit (hanya status)
   function openEditModal(data){
     document.getElementById('editTanggal').value = data.Tanggal || '';
     document.getElementById('editWali').value = data.Wali_Kelas || '';
@@ -111,25 +115,23 @@ if(document.getElementById('rekapTable')){
     new bootstrap.Modal(document.getElementById('editModal')).show();
   }
 
-  // Submit edit form
+  // Submit edit form (update hanya status)
   document.getElementById('editForm').addEventListener('submit', e=>{
     e.preventDefault();
     if(selectedRowIndex === null) return;
 
     const updatedData = {
-      Tanggal: document.getElementById('editTanggal').value,
-      Wali_Kelas: document.getElementById('editWali').value,
-      Mata_Pelajaran: document.getElementById('editMapel').value,
-      Kelas: document.getElementById('editKelas').value,
-      Nama_Siswa: document.getElementById('editNama').value,
       Status: document.getElementById('editStatus').value
     };
 
+    const rowNumber = filteredData[selectedRowIndex].rowNumber;
+
     google.script.run.withSuccessHandler(()=>{
-      filteredData[selectedRowIndex] = updatedData;
+      // update array
+      filteredData[selectedRowIndex].Status = updatedData.Status;
       renderTablePage(currentPage);
       bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
-    }).updateRekapData(updatedData, selectedRowIndex);
+    }).updateRekapData(updatedData, rowNumber);
   });
 
   // Apply filter
