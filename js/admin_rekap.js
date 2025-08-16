@@ -3,7 +3,6 @@
 // ==========================
 const user = sessionStorage.getItem('user');
 if(!user){
-  overlay.remove();
   alert('Anda belum login! Akses ditolak.');
   window.location.href = 'login.html';
 }
@@ -156,3 +155,4 @@ async function init() {
 
 // Jalankan inisialisasi
 init();
+
