@@ -12,7 +12,7 @@
 <!-- Navbar Admin -->
 <nav class="navbar navbar-expand-lg shadow-sm">
   <div class="container">
-    <a class="navbar-brand fw-bold" href="#">SIALAN – Admin Panel</a>
+    <a class="navbar-brand fw-bold" href="">SIALAN – Admin Panel</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarAdminMenu">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -25,7 +25,7 @@
           <a class="nav-link" href="admin_rekap.html">Rekap KBM</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#" id="logoutBtn">Logout</a>
+          <a class="nav-link" href="index.html" id="logoutBtn">Logout</a>
         </li>
       </ul>
     </div>
@@ -38,33 +38,75 @@
       <h3 class="mb-3">Input Data KBM</h3>
 
       <form id="inputForm">
-        <div class="mb-3">
-          <label for="tanggal" class="form-label">Tanggal</label>
-          <input type="date" id="tanggal" class="form-control" required>
-        </div>
 
+        <!-- Wali Kelas -->
         <div class="mb-3">
           <label for="walikelas" class="form-label">Wali Kelas</label>
           <select id="walikelas" class="form-select" required>
             <option value="">-Pilih dulu-</option>
+            <option>Ahmad Muhlisin, S. Pd. I</option>
+            <option>M. Arif Darmawan, S.Pd</option>
+            <option>Murtaji, S.Pd.I</option>
+            <option>Muhammad Nashih, S.IP</option>
+            <option>Tri Wahyu Setyaningrum,S.Pd</option>
+            <option>Defi Anggaraini, S.Pd</option>
+            <option>Zoe Mienhaj Fadhillah, S. Sos</option>
+            <option>Rohmad Subhan, S. Pi</option>
+            <option>Edy Suprayitno, S. Pd</option>
+            <option>Imron Choironi, S.Pd</option>
+            <option>Khoirul Akhirin, S. Pd. I</option>
+            <option>Lutfi Rahma Adiani, S.Pd</option>
+            <option>Faridatul Riana, S.Pd</option>
+            <option>Yusuf Imami, S.Pd</option>
+            <option>Saiful Arif, ST.</option>
+            <option>Achmad Aliem, S.Pd</option>
+            <option>Faisol Effendi, S.Pd</option>
+            <option>M. Suliyanto, S.Ag</option>
+            <option>Indah Purnamasari, S.Pd</option>
+            <option>Naibatul Lu'luiyah, S.Pd.I</option>
           </select>
         </div>
 
+        <!-- Mata Pelajaran -->
         <div class="mb-3">
           <label for="matapelajaran" class="form-label">Mata Pelajaran</label>
           <select id="matapelajaran" class="form-select" required>
             <option value="">-Pilih dulu-</option>
+            <option>Al-Qur'an Hadist</option>
+            <option>Akidah Akhlak</option>
+            <option>Fikih</option>
+            <option>SKI</option>
+            <option>Bahasa Arab</option>
+            <option>PPKN</option>
+            <option>Bahasa Indonesia</option>
+            <option>MTK</option>
+            <option>IPA</option>
+            <option>IPS</option>
+            <option>Bahasa Inggris</option>
+            <option>PJOK</option>
+            <option>Informatika</option>
+            <option>Seni Budaya</option>
+            <option>Prakarya</option>
+            <option>Bahasa Jawa</option>
+            <option>Ke-NU-an</option>
           </select>
         </div>
 
+        <!-- Kelas -->
         <div class="mb-3">
           <label for="kelas" class="form-label">Kelas</label>
           <select id="kelas" class="form-select" required>
             <option value="">-Pilih dulu-</option>
+            <option>7A</option><option>7B</option><option>7C</option><option>7D</option>
+            <option>7E</option><option>7F</option><option>7G</option>
+            <option>8A</option><option>8B</option><option>8C</option><option>8D</option>
+            <option>8E</option><option>8F</option>
+            <option>9A</option><option>9B</option><option>9C</option><option>9D</option>
+            <option>9E</option><option>9F</option><option>9G</option>
           </select>
         </div>
 
-        <!-- Tombol Pilih Semua Status (tersimpan di div terpisah agar bisa di-hide) -->
+        <!-- Tombol Pilih Semua Status -->
         <div class="mb-3" id="statusAllButtons" style="display:none;">
           <button type="button" id="tuntasAll" class="btn btn-success me-2">Tuntas Semua</button>
           <button type="button" id="ujianAll" class="btn btn-warning">Ujian Semua</button>
@@ -87,7 +129,6 @@
 
         <button type="submit" class="btn btn-primary">Simpan</button>
       </form>
-
     </div>
   </div>
 </section>
@@ -99,6 +140,3 @@
 <script src="js/admin_input.js"></script>
 </body>
 </html>
-
-
-
