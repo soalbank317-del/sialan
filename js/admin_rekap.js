@@ -1,19 +1,15 @@
 // ===========================================
 // Variabel Global
 // ===========================================
-// allData: menyimpan semua data dari Google Sheets
-// filteredData: menyimpan data yang sudah difilter sesuai input user
-// currentPage: halaman saat ini di tabel paginasi
-// rowsPerPage: jumlah baris per halaman
 let allData = [], filteredData = [], currentPage = 1, rowsPerPage = 15;
 
 // ===========================================
 // Fungsi: parseIndoDateTime
 // ===========================================
-// Mengubah string tanggal Indonesia "dd/mm/yyyy hh:mm:ss" menjadi objek Date JS
+// Mengubah tanggal Indonesia "dd/mm/yyyy hh:mm:ss" menjadi objek Date
 function parseIndoDateTime(dateStr) {
   const [datePart, timePart] = dateStr.split(" ");
-  if (!datePart) return new Date(dateStr); // fallback
+  if (!datePart) return new Date(dateStr);
   const [day, month, year] = datePart.split("/").map(Number);
   let hours = 0, minutes = 0, seconds = 0;
   if (timePart) [hours, minutes, seconds] = timePart.split(":").map(Number);
@@ -23,7 +19,6 @@ function parseIndoDateTime(dateStr) {
 // ===========================================
 // Fungsi: sortByLatestDate
 // ===========================================
-// Mengurutkan data berdasarkan tanggal terbaru ke terlama
 function sortByLatestDate(data) {
   return data.sort((a, b) => parseIndoDateTime(b.Tanggal) - parseIndoDateTime(a.Tanggal));
 }
@@ -31,28 +26,33 @@ function sortByLatestDate(data) {
 // ===========================================
 // Fungsi: loadRekapData
 // ===========================================
-// Mengambil data dari Google Sheets melalui Apps Script
-// lalu menyimpan ke variabel global dan menampilkan halaman pertama
-function loadRekapData() {
-  google.script.run.withSuccessHandler(function(data) {
-    allData = data;                    // simpan semua data
-    filteredData = [...allData];       // salin data untuk filter
-    allData = sortByLatestDate(allData); // urutkan berdasarkan tanggal terbaru
-    renderTablePage(currentPage);      // tampilkan halaman pertama
-  }).getRekapData();
+// Memuat CSV dari Google Sheets publik
+async function loadRekapData() {
+  const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQAEwBLEhaehGYlzYsNhBPfmozGvRZmpjyEOHC8rfgduB0JRurz-xwI_jfW8Fw8Vaz93a_E9tLyuIX9/pub?gid=0&single=true&output=csv";
+  const res = await fetch(url);
+  const csvText = await res.text();
+  const lines = csvText.split("\n").filter(l => l.trim() !== "");
+
+  // Header pakai koma sesuai CSV publik
+  const headers = lines[0].split(",").map(h => h.trim().replace(/\s+/g, "_"));
+
+  return lines.slice(1).map(line => {
+    const vals = line.split(",");
+    const obj = {};
+    headers.forEach((h, i) => obj[h] = (vals[i] || "").trim());
+    return obj;
+  });
 }
 
 // ===========================================
 // Fungsi: renderTablePage
 // ===========================================
-// Menampilkan data di tabel sesuai halaman dan rowsPerPage
 function renderTablePage(page) {
   const tbody = document.querySelector('#rekapTable tbody');
-  tbody.innerHTML = '';                 // kosongkan tbody sebelum render
+  tbody.innerHTML = '';
   const start = (page - 1) * rowsPerPage;
   const end = start + rowsPerPage;
 
-  // Loop data yang sesuai halaman
   filteredData.slice(start, end).forEach(row => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
@@ -66,7 +66,6 @@ function renderTablePage(page) {
     tbody.appendChild(tr);
   });
 
-  // Jika tidak ada data, tampilkan pesan
   if (filteredData.length === 0) {
     tbody.innerHTML = '<tr><td colspan="6" class="text-center">Data tidak tersedia</td></tr>';
   }
@@ -82,7 +81,6 @@ function renderTablePage(page) {
 // ===========================================
 // Fungsi: applyFilters
 // ===========================================
-// Filter data sesuai input user: kelas, mata pelajaran, status, nama siswa
 function applyFilters() {
   const kelas = document.getElementById('filterKelas').value;
   const matapelajaran = document.getElementById('filterMatapelajaran').value;
@@ -96,29 +94,30 @@ function applyFilters() {
     (!search || (d.Nama_Siswa || "").toLowerCase().includes(search))
   );
 
-  filteredData = sortByLatestDate(filteredData); // urutkan ulang
-  currentPage = 1;                                // reset ke halaman 1
+  filteredData = sortByLatestDate(filteredData);
+  currentPage = 1;
   renderTablePage(currentPage);
 }
 
 // ===========================================
 // Fungsi: init
 // ===========================================
-// Inisialisasi halaman: load data, setup filter, pagination, rows per page
-function init() {
-  loadRekapData();
+async function init() {
+  allData = await loadRekapData();
+  allData = sortByLatestDate(allData);
+  filteredData = [...allData];
 
-  // Populate filter options dari data yang ada
+  // Populate filter options
   const kelasSet = new Set(allData.map(d => d.Kelas).filter(Boolean));
   const matapelajaranSet = new Set(allData.map(d => d.Mata_Pelajaran).filter(Boolean));
 
   kelasSet.forEach(k => document.getElementById('filterKelas').innerHTML += `<option value="${k}">${k}</option>`);
   matapelajaranSet.forEach(m => document.getElementById('filterMatapelajaran').innerHTML += `<option value="${m}">${m}</option>`);
 
+  renderTablePage(currentPage);
+
   // Event listener filter
   document.getElementById('applyFilter').addEventListener('click', applyFilters);
-
-  // Reset filter
   document.getElementById('resetFilter').addEventListener('click', () => {
     document.getElementById('filterKelas').value = '';
     document.getElementById('filterMatapelajaran').value = '';
@@ -129,7 +128,7 @@ function init() {
     renderTablePage(currentPage);
   });
 
-  // Event listener untuk ubah jumlah baris per halaman
+  // Event listener rows per page
   document.getElementById('rowsPerPage').addEventListener('change', e => {
     rowsPerPage = parseInt(e.target.value);
     currentPage = 1;
@@ -145,7 +144,5 @@ function init() {
   });
 }
 
-// ===========================================
-// Jalankan inisialisasi saat halaman siap
-// ===========================================
+// Jalankan inisialisasi
 init();
