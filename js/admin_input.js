@@ -1,46 +1,3 @@
-// ==========================
-// === 1) Overlay / Loader ==
-// ==========================
-const overlay = document.createElement('div');
-overlay.id = 'overlay';
-Object.assign(overlay.style, {
-  position: 'fixed',
-  top: '0',
-  left: '0',
-  width: '100%',
-  height: '100%',
-  background: 'rgba(255,255,255,0.9)',
-  zIndex: '9999',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center'
-});
-overlay.innerHTML = `
-  <div class="spinner-border text-primary" role="status">
-    <span class="visually-hidden">Loading...</span>
-  </div>
-`;
-document.body.prepend(overlay);
-
-// ==========================
-// === 2) Proteksi Login ====
-// ==========================
-const user = sessionStorage.getItem('user');
-if (!user) {
-  overlay.remove();
-  alert('Anda belum login! Akses ditolak.');
-  window.location.href = 'login.html';
-}
-
-// ==========================
-// === 3) Logout Handler ====
-// ==========================
-document.getElementById('logoutBtn')?.addEventListener('click', (e) => {
-  e.preventDefault();
-  sessionStorage.removeItem('user');
-  window.location.href = 'index.html';
-});
-
 const overlay = document.createElement('div');
 overlay.id = 'overlay';
 Object.assign(overlay.style, {
@@ -151,3 +108,4 @@ function attachSubmit(){
 document.addEventListener('DOMContentLoaded', async ()=>{
   try{ await initSiswaTable(); attachSelectAllButtons(); attachSubmit(); } finally{ overlay.remove(); }
 });
+
