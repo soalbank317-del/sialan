@@ -1,3 +1,51 @@
+// ==========================
+// === 1. Overlay / Loader ===
+// ==========================
+// Membuat layer overlay untuk menutupi halaman saat halaman sedang load
+const overlay = document.createElement('div');
+overlay.id = 'overlay';
+Object.assign(overlay.style, {
+  position: 'fixed',          // menempel ke seluruh layar
+  top: '0',
+  left: '0',
+  width: '100%',
+  height: '100%',
+  background: 'rgba(255,255,255,0.9)', // semi-transparent putih
+  zIndex: '9999',             // pastikan overlay di atas elemen lain
+  display: 'flex',            // pakai flex untuk centering
+  alignItems: 'center',
+  justifyContent: 'center'
+});
+// HTML spinner bootstrap di overlay
+overlay.innerHTML = `
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+`;
+// menambahkan overlay ke body di paling atas
+document.body.prepend(overlay);
+
+// ==========================
+// === 2. Proteksi Login ===
+// ==========================
+// Mengecek apakah user sudah login atau belum
+const user = sessionStorage.getItem('user');
+if(!user){
+  overlay.remove(); // hilangkan overlay
+  alert('Anda belum login! Akses ditolak.');
+  window.location.href = 'login.html'; // redirect ke halaman login
+}
+
+// ==========================
+// === 3. Logout Handler ===
+// ==========================
+// Tombol logout untuk menghapus sessionStorage dan redirect
+document.getElementById('logoutBtn')?.addEventListener('click', e=>{
+  e.preventDefault();
+  sessionStorage.removeItem('user'); // hapus data login
+  window.location.href='index.html'; // redirect ke homepage
+});
+
 // ===========================================
 // Variabel Global
 // ===========================================
@@ -146,3 +194,4 @@ async function init() {
 
 // Jalankan inisialisasi
 init();
+
