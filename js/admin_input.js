@@ -21,8 +21,8 @@ document.getElementById('logoutBtn')?.addEventListener('click', e=>{
 // URL CSV siswa
 const urlSiswa = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQXOP4L2k61miTcFTlb4r0QigIWRsMzVazznXCbNLqaHBpwY9RKgjnXdW4figjJZLmrrPcXbU6Q1f-E/pub?gid=852230839&single=true&output=csv";
 
-// Web App GAS
-const saveEndpoint = "https://script.google.com/macros/s/AKfycbywNxbXSdmT97-tdSFh9xdk4-Hjj5IOCVb9ziTNBfPEACnLJFsXKX7aVMC5vE88_vhC/exec";
+// URL Web App
+const saveEndpoint = "https://script.google.com/macros/s/AKfycbz1njYB60bAlJhm2vlpdNR2kNnS-ST68R_gPGc7RWHcFuEhf54-YB_5_oGH2PxBYhBF/exec"
 
 // Ambil CSV
 async function fetchCSV(url){
@@ -108,4 +108,5 @@ function attachSubmit(){
 document.addEventListener('DOMContentLoaded', async ()=>{
   try{ await initSiswaTable(); attachSelectAllButtons(); attachSubmit(); } finally{ overlay.remove(); }
 });
+
 
