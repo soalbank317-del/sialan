@@ -6,7 +6,6 @@ let allData = [], filteredData = [], currentPage = 1, rowsPerPage = 15;
 // ===========================================
 // Fungsi: parseIndoDateTime
 // ===========================================
-// Mengubah tanggal Indonesia "dd/mm/yyyy hh:mm:ss" menjadi objek Date
 function parseIndoDateTime(dateStr) {
   const [datePart, timePart] = dateStr.split(" ");
   if (!datePart) return new Date(dateStr);
@@ -26,14 +25,12 @@ function sortByLatestDate(data) {
 // ===========================================
 // Fungsi: loadRekapData
 // ===========================================
-// Memuat CSV dari Google Sheets publik
 async function loadRekapData() {
   const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQAEwBLEhaehGYlzYsNhBPfmozGvRZmpjyEOHC8rfgduB0JRurz-xwI_jfW8Fw8Vaz93a_E9tLyuIX9/pub?gid=0&single=true&output=csv";
   const res = await fetch(url);
   const csvText = await res.text();
   const lines = csvText.split("\n").filter(l => l.trim() !== "");
 
-  // Header pakai koma sesuai CSV publik
   const headers = lines[0].split(",").map(h => h.trim().replace(/\s+/g, "_"));
 
   return lines.slice(1).map(line => {
@@ -70,11 +67,8 @@ function renderTablePage(page) {
     tbody.innerHTML = '<tr><td colspan="6" class="text-center">Data tidak tersedia</td></tr>';
   }
 
-  // Update indikator halaman
   document.getElementById('pageNum').textContent = currentPage;
   document.getElementById('totalPages').textContent = Math.ceil(filteredData.length / rowsPerPage);
-
-  // Tampilkan jumlah data yang ditemukan
   document.getElementById('totalFiltered').textContent = `Jumlah Data Ditemukan: ${filteredData.length}`;
 }
 
@@ -107,7 +101,6 @@ async function init() {
   allData = sortByLatestDate(allData);
   filteredData = [...allData];
 
-  // Populate filter options
   const kelasSet = new Set(allData.map(d => d.Kelas).filter(Boolean));
   const matapelajaranSet = new Set(allData.map(d => d.Mata_Pelajaran).filter(Boolean));
 
@@ -115,8 +108,8 @@ async function init() {
   matapelajaranSet.forEach(m => document.getElementById('filterMatapelajaran').innerHTML += `<option value="${m}">${m}</option>`);
 
   renderTablePage(currentPage);
+  overlay.remove();
 
-  // Event listener filter
   document.getElementById('applyFilter').addEventListener('click', applyFilters);
   document.getElementById('resetFilter').addEventListener('click', () => {
     document.getElementById('filterKelas').value = '';
@@ -128,14 +121,12 @@ async function init() {
     renderTablePage(currentPage);
   });
 
-  // Event listener rows per page
   document.getElementById('rowsPerPage').addEventListener('change', e => {
     rowsPerPage = parseInt(e.target.value);
     currentPage = 1;
     renderTablePage(currentPage);
   });
 
-  // Pagination
   document.getElementById('prevPage').addEventListener('click', () => {
     if (currentPage > 1) { currentPage--; renderTablePage(currentPage); }
   });
