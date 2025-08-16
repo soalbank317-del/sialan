@@ -61,8 +61,7 @@ const urls = {
 // === 5) Endpoint Save  ====
 // ==========================
 // Ganti dengan URL Web App milik Apps Script kamu
-const saveEndpoint = "https://script.google.com/macros/s/AKfycbwv7x7eHXHQDjFQcylMbwVuFitikFfAEsm8ARwa9gibE1RKinQpwfTSSHMe3Eqr0gWH/exec"; // contoh: https://script.google.com/macros/s/AKfycb.../exec
-
+const saveEndpoint = "https://script.google.com/macros/s/AKfycbywNxbXSdmT97-tdSFh9xdk4-Hjj5IOCVb9ziTNBfPEACnLJFsXKX7aVMC5vE88_vhC/exec"
 // ==========================
 // === 6) Util: fetchCSV  ====
 // ==========================
@@ -265,4 +264,5 @@ document.addEventListener("DOMContentLoaded", async () => {
     overlay.remove();
   }
 });
+
 
