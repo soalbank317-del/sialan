@@ -1,14 +1,19 @@
 // ===========================================
 // Variabel Global
 // ===========================================
+// allData: menyimpan semua data dari Google Sheets
+// filteredData: menyimpan data yang sudah difilter sesuai input user
+// currentPage: halaman saat ini di tabel paginasi
+// rowsPerPage: jumlah baris per halaman
 let allData = [], filteredData = [], currentPage = 1, rowsPerPage = 15;
 
 // ===========================================
 // Fungsi: parseIndoDateTime
 // ===========================================
+// Mengubah string tanggal Indonesia "dd/mm/yyyy hh:mm:ss" menjadi objek Date JS
 function parseIndoDateTime(dateStr) {
   const [datePart, timePart] = dateStr.split(" ");
-  if (!datePart) return new Date(dateStr);
+  if (!datePart) return new Date(dateStr); // fallback
   const [day, month, year] = datePart.split("/").map(Number);
   let hours = 0, minutes = 0, seconds = 0;
   if (timePart) [hours, minutes, seconds] = timePart.split(":").map(Number);
@@ -18,6 +23,7 @@ function parseIndoDateTime(dateStr) {
 // ===========================================
 // Fungsi: sortByLatestDate
 // ===========================================
+// Mengurutkan data berdasarkan tanggal terbaru ke terlama
 function sortByLatestDate(data) {
   return data.sort((a, b) => parseIndoDateTime(b.Tanggal) - parseIndoDateTime(a.Tanggal));
 }
@@ -25,27 +31,30 @@ function sortByLatestDate(data) {
 // ===========================================
 // Fungsi: loadRekapData
 // ===========================================
+// Mengambil data dari Google Sheets melalui Apps Script
+// lalu menyimpan ke variabel global dan menampilkan halaman pertama
 function loadRekapData() {
   google.script.run.withSuccessHandler(function(data) {
-    allData = data;
-    filteredData = [...allData];
-    allData = sortByLatestDate(allData);
-    renderTablePage(currentPage);
+    allData = data;                    // simpan semua data
+    filteredData = [...allData];       // salin data untuk filter
+    allData = sortByLatestDate(allData); // urutkan berdasarkan tanggal terbaru
+    renderTablePage(currentPage);      // tampilkan halaman pertama
   }).getRekapData();
 }
 
 // ===========================================
 // Fungsi: renderTablePage
 // ===========================================
+// Menampilkan data di tabel sesuai halaman dan rowsPerPage
 function renderTablePage(page) {
   const tbody = document.querySelector('#rekapTable tbody');
-  tbody.innerHTML = '';
+  tbody.innerHTML = '';                 // kosongkan tbody sebelum render
   const start = (page - 1) * rowsPerPage;
   const end = start + rowsPerPage;
 
+  // Loop data yang sesuai halaman
   filteredData.slice(start, end).forEach(row => {
     const tr = document.createElement('tr');
-    tr.dataset.rowIndex = row.RowIndex;
     tr.innerHTML = `
       <td>${row.Tanggal || ""}</td>
       <td>${row.Wali_Kelas || ""}</td>
@@ -53,13 +62,13 @@ function renderTablePage(page) {
       <td>${row.Kelas || ""}</td>
       <td>${row.Nama_Siswa || ""}</td>
       <td>${row.Status || ""}</td>
-      <td><button class="edit-btn">Edit</button></td>
     `;
     tbody.appendChild(tr);
   });
 
+  // Jika tidak ada data, tampilkan pesan
   if (filteredData.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="7" class="text-center">Data tidak tersedia</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" class="text-center">Data tidak tersedia</td></tr>';
   }
 
   // Update indikator halaman
@@ -68,60 +77,12 @@ function renderTablePage(page) {
 
   // Tampilkan jumlah data yang ditemukan
   document.getElementById('totalFiltered').textContent = `Jumlah Data Ditemukan: ${filteredData.length}`;
-
-  // Event listener untuk tombol Edit
-  document.querySelectorAll('.edit-btn').forEach(button => {
-    button.addEventListener('click', function() {
-      const rowIndex = this.closest('tr').dataset.rowIndex;
-      const rowData = filteredData.find(row => row.RowIndex == rowIndex);
-      if (rowData) {
-        openEditModal(rowData);
-      }
-    });
-  });
-}
-
-// ===========================================
-// Fungsi: openEditModal
-// ===========================================
-function openEditModal(rowData) {
-  document.getElementById('editModal').style.display = 'block';
-  document.getElementById('editNama').value = rowData.Nama_Siswa;
-  document.getElementById('editStatus').value = rowData.Status;
-  document.getElementById('editRowIndex').value = rowData.RowIndex;
-}
-
-// ===========================================
-// Fungsi: closeEditModal
-// ===========================================
-function closeEditModal() {
-  document.getElementById('editModal').style.display = 'none';
-}
-
-// ===========================================
-// Fungsi: saveEdit
-// ===========================================
-function saveEdit() {
-  const rowIndex = document.getElementById('editRowIndex').value;
-  const updatedStatus = document.getElementById('editStatus').value;
-
-  const updatedData = {
-    Status: updatedStatus
-  };
-
-  google.script.run.withSuccessHandler(function() {
-    const row = filteredData.find(row => row.RowIndex == rowIndex);
-    if (row) {
-      row.Status = updatedStatus;
-      renderTablePage(currentPage);
-      closeEditModal();
-    }
-  }).updateRekapData(updatedData, rowIndex);
 }
 
 // ===========================================
 // Fungsi: applyFilters
 // ===========================================
+// Filter data sesuai input user: kelas, mata pelajaran, status, nama siswa
 function applyFilters() {
   const kelas = document.getElementById('filterKelas').value;
   const matapelajaran = document.getElementById('filterMatapelajaran').value;
@@ -135,18 +96,19 @@ function applyFilters() {
     (!search || (d.Nama_Siswa || "").toLowerCase().includes(search))
   );
 
-  filteredData = sortByLatestDate(filteredData);
-  currentPage = 1;
+  filteredData = sortByLatestDate(filteredData); // urutkan ulang
+  currentPage = 1;                                // reset ke halaman 1
   renderTablePage(currentPage);
 }
 
 // ===========================================
 // Fungsi: init
 // ===========================================
+// Inisialisasi halaman: load data, setup filter, pagination, rows per page
 function init() {
   loadRekapData();
 
-  // Populate filter options
+  // Populate filter options dari data yang ada
   const kelasSet = new Set(allData.map(d => d.Kelas).filter(Boolean));
   const matapelajaranSet = new Set(allData.map(d => d.Mata_Pelajaran).filter(Boolean));
 
@@ -155,6 +117,8 @@ function init() {
 
   // Event listener filter
   document.getElementById('applyFilter').addEventListener('click', applyFilters);
+
+  // Reset filter
   document.getElementById('resetFilter').addEventListener('click', () => {
     document.getElementById('filterKelas').value = '';
     document.getElementById('filterMatapelajaran').value = '';
@@ -165,7 +129,7 @@ function init() {
     renderTablePage(currentPage);
   });
 
-  // Event listener rows per page
+  // Event listener untuk ubah jumlah baris per halaman
   document.getElementById('rowsPerPage').addEventListener('change', e => {
     rowsPerPage = parseInt(e.target.value);
     currentPage = 1;
@@ -179,11 +143,9 @@ function init() {
   document.getElementById('nextPage').addEventListener('click', () => {
     if (currentPage < Math.ceil(filteredData.length / rowsPerPage)) { currentPage++; renderTablePage(currentPage); }
   });
-
-  // Modal close
-  document.getElementById('closeModal').addEventListener('click', closeEditModal);
-  document.getElementById('saveEdit').addEventListener('click', saveEdit);
 }
 
-// Jalankan inisialisasi
+// ===========================================
+// Jalankan inisialisasi saat halaman siap
+// ===========================================
 init();
